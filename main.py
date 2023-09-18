@@ -1,5 +1,4 @@
-"""
-Module 1: Zuil
+"""Module 1: Zuil
 Op een zuil op een willekeurig NS-station kunnen reizigers hun bericht van maximaal 140 karakters invoeren. Het bericht moet worden opgeslagen in een tekstbestand met een logische structuur. Sla de onderstaande gegevens op in een gestructureerd tekstbestand:
 
 het bericht;
@@ -12,9 +11,7 @@ Deze module werkt met een Command Line Interface (CLI).
 import random
 from datetime import datetime
 
-
-def get_time(frmt: str):
-    return datetime.now().strftime(frmt)
+import utils
 
 
 def get_random_station():
@@ -27,10 +24,12 @@ def main():
 
     # Bericht mag niet meer dan 140 letters hebben
     while len(bericht) > 140:
+        # print("Zorg dat je bericht niet langer dan 140 letters is! ", end=' ')
         bericht = input("je bericht: (max 140 letters) ")
 
     naam = input("wat is je naam: (niks invullen is 'anoniem') ")
 
+    # heeft niks ingevuld
     if not naam:
         naam = "anoniem"
 
@@ -38,7 +37,7 @@ def main():
     station = get_random_station()
 
     # De tijd als string
-    timeStr = get_time("%d-%m-%y %H:%M")
+    timeStr = utils.get_time_str("%d-%m-%y %H:%M")
 
     # Sla het bericht op
     with open("berichten.txt", "a+") as f:
