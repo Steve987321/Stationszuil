@@ -19,9 +19,9 @@ import utils
 
 
 # TODO: naar bestand?
-BANNED_WORDS = (
+BANNED_WORDS = [
     "sukkel"
-)
+]
 
 
 class ModBeoordeling:
@@ -36,8 +36,8 @@ def check_bericht(bericht: str, naam: str, email: str):
     beoordeling = ModBeoordeling(
         False,
         utils.get_time_str("%d-%m-%y %H:%M"),
-        "Moderator Bob",
-        "Bob@email.station"
+        naam,
+        email
     )
 
     # naar kleine letters
