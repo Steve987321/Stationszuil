@@ -3,11 +3,13 @@ import zuil
 
 
 def main():
-    bericht = zuil.vraag_bericht()
+    GUI = zuil.ZuilGUI()
+    GUI.show()
+    # bericht = zuil.vraag_bericht()
 
     #
 
-    zuil.sla_bericht_op(bericht)
+    # zuil.sla_bericht_op(bericht)
 
 
 if __name__ == "__main__":
