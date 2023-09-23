@@ -9,13 +9,15 @@ de naam van de reiziger – als de reiziger geen naam invult, gebruik dan als na
 het station – deze locatie van de zuil mag in de module zelf worden vastgelegd op basis van een random choice van drie stations. De computer (jouw python computer programma) kiest dan één station uit een lijst Download lijstvan minimaal drie stations en dat station wordt dan gekoppeld aan de berichten.
 """
 
-import utils
+
 import random
 
 from tkinter import *
+from datetime import datetime
+
 
 # constanten
-MAX_BERICHT_LENGTE = 5        # de maximale lengte van een bericht
+MAX_BERICHT_LENGTE = 140        # de maximale lengte van een bericht
 BESTAND_NAAM = "berichten.txt"  # waar de berichten worden opgeslagen
 
 GREEN = "#0F0"
@@ -30,44 +32,47 @@ class ZuilGUI():
         self.root.title(naam_window)
         self.root.resizable(False, False)
         
-        self.invoer_frame = Frame(self.root, height=300, width = 450)
+        self.invoer_frame = Frame(self.root, height=300, width=450)
         self.invoer_frame.grid_propagate(False)
         self.invoer_frame.pack()
 
         self.invoer_naam_label = Label(self.invoer_frame, text="naam")
-        self.invoer_naam_label.place(relx=0.25, rely=0.1, anchor=E)
+        self.invoer_naam_label.place(relx=0.2, rely=0.12, width=350, anchor=CENTER)
 
         self.invoer_naam = Entry(self.invoer_frame)
-        self.invoer_naam.place(relx=0.25, rely=0.2, anchor=CENTER)
+        self.invoer_naam.place(relx=0.5, rely=0.2, width=350, anchor=CENTER)
 
-        self.invoer_textbox = Text(self.invoer_frame, highlightthickness=1, borderwidth=1)
-        self.invoer_textbox.place(relx=0.5, rely=0.5, height=150, width=350, anchor=CENTER)
-        self.invoer_textbox.bind("<KeyRelease>", self.check_bericht_limiet)
+        self.invoer_bericht_label = Label(self.invoer_frame, text="bericht")
+        self.invoer_bericht_label.place(relx=0.2, rely=0.31, width=350, anchor=CENTER)
+
+        self.invoer_bericht = Text(self.invoer_frame, highlightthickness=1, borderwidth=1)
+        self.invoer_bericht.place(relx=0.5, rely=0.6, height=150, width=350, anchor=CENTER)
+        self.invoer_bericht.bind("<KeyRelease>", self.check_bericht_limiet)
         
         self.invoer_limiet_label = Label(self.invoer_frame, wraplength=350, fg=GRAY,text=f"0/{MAX_BERICHT_LENGTE}")
-        self.invoer_limiet_label.place(relx=0.85, rely=0.8, anchor=CENTER)
+        self.invoer_limiet_label.place(relx=0.85, rely=0.9, anchor=CENTER)
 
         self.btn_verstuur = Button(self.invoer_frame, text="verstuur", command=self.on_button_press)
-        self.btn_verstuur.place(relx=0.5, rely=0.8, height=20, width=80, anchor=CENTER)
+        self.btn_verstuur.place(relx=0.5, rely=0.9, height=20, width=80, anchor=CENTER)
 
 
     def check_bericht_limiet(self, event):
         """"""
-        invoer_len = len(self.invoer_textbox.get("1.0", "end-1c"))
+        invoer_len = len(self.invoer_bericht.get("1.0", "end-1c"))
         self.invoer_limiet_label.configure(text=f"{invoer_len}/{MAX_BERICHT_LENGTE}")
         if invoer_len > MAX_BERICHT_LENGTE:
             self.invoer_limiet_label.configure(fg=RED)
-            self.invoer_textbox.configure(highlightcolor=RED)
+            self.invoer_bericht.configure(highlightcolor=RED)
             self.btn_verstuur["state"] = DISABLED
         else:
             self.invoer_limiet_label.configure(fg=GRAY)
-            self.invoer_textbox.configure(highlightcolor=WHITE)
+            self.invoer_bericht.configure(highlightcolor=WHITE)
             self.btn_verstuur["state"] = NORMAL
 
 
     def on_button_press(self):
         naam = self.invoer_naam.get()
-        bericht = self.invoer_textbox.get("1.0", "end-1c")
+        bericht = self.invoer_bericht.get("1.0", "end-1c")
         station = get_random_station()
         tijd = utils.get_time_str("%d-%m-%y %H:%M")
 
@@ -124,3 +129,8 @@ def sla_bericht_op(bericht: str):
     """"Slaat het bericht op in het bestand via append."""
     with open(BESTAND_NAAM, "a+") as f:
         f.write(bericht)
+
+
+def get_time_str(frmt: str):
+    """ Geeft de tijd als string terug met de gegeven tijd formaat. """
+    return datetime.now().strftime(frmt)
