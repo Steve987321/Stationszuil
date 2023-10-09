@@ -9,16 +9,16 @@ de naam van de reiziger – als de reiziger geen naam invult, gebruik dan als na
 het station – deze locatie van de zuil mag in de module zelf worden vastgelegd op basis van een random choice van drie stations. De computer (jouw python computer programma) kiest dan één station uit een lijst Download lijstvan minimaal drie stations en dat station wordt dan gekoppeld aan de berichten.
 """
 
-
 import random
-
-from tkinter import *
+import csv
 from datetime import datetime
-
+from tkinter import *
 
 # constanten
 MAX_BERICHT_LENGTE = 140        # de maximale lengte van een bericht
-BESTAND_NAAM = "berichten.txt"  # waar de berichten worden opgeslagen
+BESTAND_NAAM = "berichten.csv"  # waar de berichten worden opgeslagen
+
+CSV_BESTAND_VELDEN = ["naam", "bericht", "station", "tijd"] 
 
 GREEN = "#0F0"
 RED = "#F00"
@@ -50,17 +50,17 @@ class ZuilGUI():
         self.invoer_bericht.bind("<KeyRelease>", self.check_bericht_limiet)
         
         self.invoer_limiet_label = Label(self.invoer_frame, wraplength=350, fg=GRAY,text=f"0/{MAX_BERICHT_LENGTE}")
-        self.invoer_limiet_label.place(relx=0.85, rely=0.9, anchor=CENTER)
+        self.invoer_limiet_label.place(relx=0.8, rely=0.9, anchor=CENTER)
 
         self.btn_verstuur = Button(self.invoer_frame, text="verstuur", command=self.on_button_press)
         self.btn_verstuur.place(relx=0.5, rely=0.9, height=20, width=80, anchor=CENTER)
-
 
     def check_bericht_limiet(self, event):
         """"""
         invoer_len = len(self.invoer_bericht.get("1.0", "end-1c"))
         self.invoer_limiet_label.configure(text=f"{invoer_len}/{MAX_BERICHT_LENGTE}")
         if invoer_len > MAX_BERICHT_LENGTE:
+            self.invoer_limiet_label.configure(text=f"limiet bereikt {invoer_len}/{MAX_BERICHT_LENGTE}")
             self.invoer_limiet_label.configure(fg=RED)
             self.invoer_bericht.configure(highlightcolor=RED)
             self.btn_verstuur["state"] = DISABLED
@@ -74,9 +74,12 @@ class ZuilGUI():
         naam = self.invoer_naam.get()
         bericht = self.invoer_bericht.get("1.0", "end-1c")
         station = get_random_station()
-        tijd = utils.get_time_str("%d-%m-%y %H:%M")
+        tijd = get_time_str("%d-%m-%y %H:%M")
 
-        opgeslagen_bericht =  f"'{bericht}'\n-{naam} op {tijd} van {station}"
+        if len(naam) == 0:
+            naam = "anoniem"
+
+        opgeslagen_bericht =  {"naam": naam, "bericht": bericht, "tijd": tijd, "station": station}
 
         sla_bericht_op(opgeslagen_bericht)
 
@@ -85,6 +88,7 @@ class ZuilGUI():
     def show(self):
         self.root.mainloop()
 
+
 def get_random_station():
     """Pakt een willekeurige station uit stations.txt
 
@@ -92,7 +96,7 @@ def get_random_station():
         De station naam als string.
     """
     with open("stations.txt", 'r') as f:
-        return random.choice(f.readlines())
+        return random.choice(f.readlines()).strip()
 
 
 def vraag_bericht():
@@ -117,18 +121,24 @@ def vraag_bericht():
     station = get_random_station()
 
     # De tijd als string
-    time_str = utils.get_time_str("%d-%m-%y %H:%M")
+    time_str = get_time_str("%d-%m-%y %H:%M")
 
+    # return {"naam": naam, "bericht": bericht, "tijd": time_str, "station": station}
     return (
         f"'{bericht}'\n" 
         f"-{naam} op {time_str} van {station}"
     )
 
 
-def sla_bericht_op(bericht: str):
-    """"Slaat het bericht op in het bestand via append."""
-    with open(BESTAND_NAAM, "a+") as f:
-        f.write(bericht)
+def sla_bericht_op(bericht: dict):
+    """"Slaat het bericht op in het bestand via append.
+    
+    """
+    with open(BESTAND_NAAM, newline='', mode="a+") as f:
+        writer = csv.DictWriter(f, CSV_BESTAND_VELDEN)
+        writer.writerow(bericht)
+    # with open(BESTAND_NAAM, "a+") as f:
+        # f.write(bericht)
 
 
 def get_time_str(frmt: str):
