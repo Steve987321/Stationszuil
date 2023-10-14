@@ -1,3 +1,4 @@
+from zuil.zuil import BESTAND_NAAM
 import psycopg2
 from tkinter import * 
 
