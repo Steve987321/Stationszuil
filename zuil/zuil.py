@@ -20,6 +20,7 @@ BESTAND_NAAM = "berichten.csv"  # waar de berichten worden opgeslagen
 
 CSV_BESTAND_VELDEN = ["naam", "bericht", "station", "tijd"] 
 
+
 def get_random_station():
     """Pakt een willekeurige station uit stations.txt
 
@@ -34,6 +35,9 @@ def sla_bericht_op(bericht: dict):
     """"Slaat het bericht op in het bestand via append."""
     with open(BESTAND_NAAM, newline='', mode="a+") as f:
         writer = csv.DictWriter(f, CSV_BESTAND_VELDEN)
+        if f.tell() == 0:
+            writer.writeheader()
+
         writer.writerow(bericht)
 
 
