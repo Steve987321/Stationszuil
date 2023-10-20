@@ -1,4 +1,5 @@
 import zuil
+from datetime import datetime
 from tkinter import *
 
 GREEN = "#0F0"
@@ -56,12 +57,13 @@ class ZuilGUI():
         naam = self.invoer_naam.get()
         bericht = self.invoer_bericht.get("1.0", "end-1c")
         station = zuil.get_random_station()
-        tijd = zuil.get_time_str("%d-%m-%y %H:%M")
+        tijd = datetime.now().time()
+        datum = datetime.now().date()
 
         if len(naam) == 0:
             naam = "anoniem"
 
-        opgeslagen_bericht =  {"naam": naam, "bericht": bericht, "tijd": tijd, "station": station}
+        opgeslagen_bericht =  {"naam": naam, "bericht": bericht, "tijd": tijd, "station": station, "datum": datum}
 
         zuil.sla_bericht_op(opgeslagen_bericht)
 

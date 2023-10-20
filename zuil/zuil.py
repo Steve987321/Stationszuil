@@ -12,13 +12,12 @@ De computer (jouw python computer programma) kiest dan één station uit een lij
 
 import random
 import csv
-from datetime import datetime
 
 # constanten
 MAX_BERICHT_LENGTE = 140        # de maximale lengte van een bericht
 BESTAND_NAAM = "berichten.csv"  # waar de berichten worden opgeslagen
 
-CSV_BESTAND_VELDEN = ["naam", "bericht", "station", "tijd"] 
+CSV_BESTAND_VELDEN = ["naam", "bericht", "station", "tijd", "datum"] 
 
 
 def get_random_station():
@@ -39,8 +38,3 @@ def sla_bericht_op(bericht: dict):
             writer.writeheader()
 
         writer.writerow(bericht)
-
-
-def get_time_str(frmt: str):
-    """ Geeft de tijd als string terug met de gegeven tijd formaat. """
-    return datetime.now().strftime(frmt)
