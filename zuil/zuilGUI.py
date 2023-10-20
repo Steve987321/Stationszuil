@@ -7,6 +7,7 @@ RED = "#F00"
 BLUE = "#00F"
 WHITE = "#FFF"
 GRAY = "#999"
+BLACK = "#000"
 
 class ZuilGUI():
     def __init__(self, naam_window: str = "zuil"):
@@ -23,6 +24,11 @@ class ZuilGUI():
 
         self.invoer_naam = Entry(self.invoer_frame)
         self.invoer_naam.place(relx=0.5, rely=0.2, width=350, anchor=CENTER)
+        self.invoer_naam.bind("<FocusIn>", self.on_naam_focus_in)
+        self.invoer_naam.bind("<FocusOut>", self.on_naam_focus_out)
+        # self.invoer_naam.bind("<KeyRelease>", self.on_naam_press)
+        self.invoer_naam.insert(0, "anoniem")
+        self.invoer_naam.config(fg=GRAY)
 
         self.invoer_bericht_label = Label(self.invoer_frame, text="bericht")
         self.invoer_bericht_label.place(relx=0.2, rely=0.31, width=350, anchor=CENTER)
@@ -37,6 +43,16 @@ class ZuilGUI():
         self.btn_verstuur = Button(self.invoer_frame, text="verstuur", command=self.on_button_press)
         self.btn_verstuur.place(relx=0.5, rely=0.9, height=20, width=80, anchor=CENTER)
 
+
+    def on_naam_focus_in(self, _):
+        if self.invoer_naam.get() == "anoniem" and self.invoer_naam.cget("fg") == GRAY:
+            self.invoer_naam.delete(0, END)
+            self.invoer_naam.config(fg=WHITE)
+
+    def on_naam_focus_out(self, _):
+        if len(self.invoer_naam.get()) == 0:
+            self.invoer_naam.insert(0, "anoniem")
+            self.invoer_naam.config(fg=GRAY)
 
     def check_bericht_limiet(self, event):
         """"""
