@@ -36,6 +36,7 @@ class ZuilGUI():
         self.btn_verstuur = Button(self.invoer_frame, text="verstuur", command=self.on_button_press)
         self.btn_verstuur.place(relx=0.5, rely=0.9, height=20, width=80, anchor=CENTER)
 
+
     def check_bericht_limiet(self, event):
         """"""
         invoer_len = len(self.invoer_bericht.get("1.0", "end-1c"))
@@ -66,8 +67,10 @@ class ZuilGUI():
 
         # laat bericht zien dat het bericht is opgeslagen
 
+
     def show(self):
         self.root.mainloop()
+
 
 def main():
     GUI = ZuilGUI()
