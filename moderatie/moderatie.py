@@ -2,6 +2,7 @@ import psycopg2
 import psycopg2.extras # DictCursor
 import csv
 from tkinter import * 
+from datetime import datetime
 
 GREEN = "#0F0"
 RED = "#F00"
@@ -17,6 +18,8 @@ class Modereer():
 
         self.con = None
         self.cursor = None
+
+        self.moderator_email = None
 
         with open(self.bestand) as f:
             self.berichten = list(csv.DictReader(f))
@@ -52,6 +55,8 @@ class Modereer():
                             """,
                             (email, wachtwoord))
         
+        self.moderator_email = email
+        
         return self.cursor.fetchone()[0] == 1
         
     def geef_bericht(self):
@@ -60,11 +65,30 @@ class Modereer():
             return "Geen berichten om te beoordelen."
         return self.berichten[self.index]
     
-    def beoordeel_bericht(self, goedgekeurd):
-        """Beoordeel bericht op index"""
-        if goedgekeurd:
-            self.bericht[self.index]
+    def beoordeel_bericht(self, goedgekeurd: bool):
+        """Beoordeel bericht en stuur naar de database"""
+        self.cursor.execute("select count(*) from beoordeling")
+        beoordeling_nr = int(self.cursor.fetchone()[0])
+        tijd = datetime.now().time()
+        datum = datetime.now().date()
 
+        self.cursor.execute("""
+                            insert into beoordeling (beoordelingnr, is_goedgekeurd, datum, tijd, moderator_email)
+                            values (%s, %s, %s, %s, %s)
+                            """,
+                            (beoordeling_nr, goedgekeurd, datum, tijd, self.moderator_email))
+        self.con.commit()
+        
+        self.cursor.execute("select count(*) from bericht")
+        berichtnr = int(self.cursor.fetchone()[0])
+        bericht = self.berichten[self.index]
+        self.cursor.execute("""
+                            insert into bericht (berichtnr, tekst, datum, tijd, naam, station, beoordelingnr)
+                            values (%s, %s, %s, %s, %s, %s, %s)
+                            """,
+                            (berichtnr, bericht["bericht"], bericht["datum"], bericht["tijd"], bericht["naam"], bericht["station"], beoordeling_nr))
+        self.con.commit()
+        
         self.index += 1
         
     def update_bestand(self):
