@@ -54,7 +54,7 @@ class ZuilGUI():
             self.invoer_naam.insert(0, "anoniem")
             self.invoer_naam.config(fg=GRAY)
 
-    def check_bericht_limiet(self, event):
+    def check_bericht_limiet(self, _):
         """"""
         invoer_len = len(self.invoer_bericht.get("1.0", "end-1c"))
         self.invoer_limiet_label.configure(text=f"{invoer_len}/{zuil.MAX_BERICHT_LENGTE}")
