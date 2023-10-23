@@ -1,5 +1,6 @@
 import psycopg2
 import psycopg2.extras # DictCursor
+import psycopg2.errors # Logging errors
 import csv
 from tkinter import * 
 from datetime import datetime
@@ -29,17 +30,21 @@ class Modereer():
             print("Er is al een connectie gemaakt.")
             return
         
-        self.con = psycopg2.connect(
-                    database="StationZuil", 
-                    user="postgres",
-                    password="pass",
-                    host="localhost",
-                    port="5433"
-                    )
+        try:
+            self.con = psycopg2.connect(
+                        database="StationZuil", 
+                        user="postgres",
+                        password="pass",
+                        host="localhost",
+                        port="5433"
+                        )
+            
+            self.cursor = self.con.cursor()
+        except Exception as e:
+            print(f"Error bij het verbinden van de database: {e}")
+            return False
         
-        self.cursor = self.con.cursor()
-
-        print(self.con.status)
+        return True
 
     def disconnect(self):
         if self.con.closed:
