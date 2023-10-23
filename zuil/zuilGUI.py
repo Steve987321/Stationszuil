@@ -1,6 +1,7 @@
 import zuil
 from datetime import datetime
 from tkinter import *
+from tkinter import messagebox
 
 GREEN = "#0F0"
 RED = "#F00"
@@ -92,14 +93,11 @@ class ZuilGUI():
         tijd = datetime.now().time()
         datum = datetime.now().date()
 
-        if len(naam) == 0:
-            naam = "anoniem"
-
         opgeslagen_bericht =  {"naam": naam, "bericht": bericht, "tijd": tijd, "station": station, "datum": datum}
 
         zuil.sla_bericht_op(opgeslagen_bericht)
 
-        # laat bericht zien dat het bericht is opgeslagen
+        messagebox.showinfo("Verstuurd", "Het bericht is verstuurd en in afwachting tot beoordeling.")
 
     def show(self):
         """Voert window uit met de gemaakte widgets"""
