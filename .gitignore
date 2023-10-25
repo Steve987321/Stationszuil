@@ -1,3 +1,6 @@
+#ide 
 __pycache__
 .idea
 *.code-workspace
+#mac
+*.DS_Store
