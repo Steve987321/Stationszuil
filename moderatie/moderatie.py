@@ -34,8 +34,9 @@ class Modereer():
                         database="StationZuil", 
                         user="postgres",
                         password="pass",
-                        host="localhost",
-                        port="5433"
+                        host="51.132.140.12",
+                        port="5432",
+                        connect_timeout=5
                         )
             
             self.cursor = self.con.cursor()
@@ -243,6 +244,7 @@ class ModeratieGUI():
 def main():
     GUI = ModeratieGUI()
     GUI.show()
+
 
 if __name__ == "__main__":
     main()
