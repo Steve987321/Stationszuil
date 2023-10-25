@@ -17,10 +17,8 @@ class Modereer():
     def __init__(self, berichten_bestand_naam):
         self.bestand = berichten_bestand_naam
         self.index = 0 # hoe ver we zijn met beoordelen
-
         self.con = None
         self.cursor = None
-
         self.moderator_email = None
 
         with open(self.bestand) as f:
@@ -29,7 +27,7 @@ class Modereer():
     def connect(self):
         if self.con != None:
             print("Er is al een connectie gemaakt.")
-            return False
+            return True
         
         try:
             self.con = psycopg2.connect(
