@@ -3,6 +3,7 @@ import psycopg2.extras # DictCursor
 import psycopg2.errors # Logging errors
 import csv
 from tkinter import * 
+from tkinter import messagebox
 from datetime import datetime
 
 GREEN = "#0F0"
@@ -28,7 +29,7 @@ class Modereer():
     def connect(self):
         if self.con != None:
             print("Er is al een connectie gemaakt.")
-            return
+            return False
         
         try:
             self.con = psycopg2.connect(
@@ -104,7 +105,9 @@ class Modereer():
             f.seek(0)
             f.truncate()
 
+            # header
             f.write(lines[0])
+
             if self.index != len(self.berichten):
                 f.writelines(lines[self.index + 1:])
 
@@ -117,8 +120,9 @@ class ModeratieGUI():
     def __init__(self, naam_window: str = "moderatie"):
         self.moderatie = Modereer("berichten.csv")
 
-        self.moderatie.connect()
+        connectie_resultaat = self.moderatie.connect()
 
+        # Window
         self.root = Tk()
         self.root.title(naam_window)
         self.root.resizable(False, False)
@@ -145,8 +149,15 @@ class ModeratieGUI():
         self.btn_login = Button(self.login_frame, text="login", command=self.on_login)
         self.foutmelding_label = Label(self.login_frame, foreground=RED)
 
+        while connectie_resultaat == False: 
+            try_again = messagebox.askretrycancel("Database", f"Er kon geen connectie worden gemaakt met de database: {self.moderatie.con.status}")
+            if try_again: 
+                connectie_resultaat = self.moderatie.connect()
+            else: 
+                self.root.destroy()
+
         self.toon_login()
-        
+
     def toon_login(self):
         # verberg moderatie scherm
         self.info_frame.pack_forget()
