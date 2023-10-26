@@ -44,11 +44,12 @@ class ModeratieGUI():
         self.foutmelding_label = Label(self.login_frame, foreground=RED)
 
         while connectie_resultaat == False: 
-            try_again = messagebox.askretrycancel("Database", f"Er kon geen connectie worden gemaakt met de database: {self.moderatie.con.status}")
+            try_again = messagebox.askretrycancel("Database", f"Er kon geen connectie worden gemaakt met de database: {self.moderatie.error_str}")
             if try_again: 
                 connectie_resultaat = self.moderatie.connect()
             else: 
                 self.root.destroy()
+                connectie_resultaat = True
 
         self.toon_login()
 
