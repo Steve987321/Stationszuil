@@ -15,9 +15,12 @@ class Modereer():
         
         self.error_str = None
 
-        with open(self.bestand) as f:
-            self.berichten = list(csv.DictReader(f))
-
+        try: 
+            with open(self.bestand) as f:
+                self.berichten = list(csv.DictReader(f))
+        except Exception as e: 
+            print(f"Error tijdens het openen van {berichten_bestand_naam}: {e}")
+        
         self.db = StationsZuilDB()
 
     def connect(self):
