@@ -20,9 +20,9 @@ class ModeratieGUI:
             if try_again: 
                 connectie_resultaat = self.moderatie.connect()
             else: 
-                self.root.destroy()
-                connectie_resultaat = True
-
+                self.root = None
+                return
+            
         # Window
         self.root = Tk()
         self.root.title(naam_window)
@@ -130,6 +130,9 @@ class ModeratieGUI:
         self.moderatie.update_bestand()
 
     def show(self):
+        if self.root == None: 
+            return
+
         self.root.mainloop()
 
         self.on_update_csv()
