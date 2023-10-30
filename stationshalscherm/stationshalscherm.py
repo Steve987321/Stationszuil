@@ -54,10 +54,15 @@ class StationBerichtWidget:
     """Label en Text widget voor stationsinhoud"""
     def __init__(self, root: Misc):
         self.root = root
-        self.bericht = Text(root, state=NORMAL, height=5)
+        self.bericht = Text(root, state=DISABLED, height=5)
+        self.bericht.bind("<FocusIn>", self.on_bericht_focus)
         self.info = Label(root)
         self.info.pack()
         self.bericht.pack(fill=BOTH, expand=True)
+
+    def on_bericht_focus(self, e):
+        """Focus naar de root frame inplaats van de text widget"""
+        self.root.focus()
 
     def update(self, bericht: StationBericht = None, dict = None):
         if bericht == None: 
