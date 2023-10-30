@@ -54,15 +54,13 @@ class StationBerichtWidget:
     """Label en Text widget voor stationsinhoud"""
     def __init__(self, root: Misc):
         self.root = root
-        self.bericht = Text(root, state=DISABLED, height=5)
-        self.bericht.bind("<FocusIn>", self.on_bericht_focus)
+        self.bericht = Label(root)
         self.info = Label(root)
+        self.bericht.pack()
         self.info.pack()
-        self.bericht.pack(fill=BOTH, expand=True)
 
-    def on_bericht_focus(self, e):
-        """Focus naar de root frame inplaats van de text widget"""
-        self.root.focus()
+        # spacing 
+        Label(self.root, text="").pack()
 
     def update(self, bericht: StationBericht = None, dict = None):
         if bericht == None: 
@@ -71,15 +69,8 @@ class StationBerichtWidget:
 
             bericht = StationBericht(dict)
 
-        self.bericht["state"] = NORMAL
-
-        self.bericht.delete(1.0, END)
-        self.bericht.insert(END, bericht.text)
-
-        self.bericht["state"] = DISABLED
-
         self.info["text"] = f"{bericht.naam} op {bericht.datum} om {bericht.tijd}"
-
+        self.bericht["text"] = f"“{bericht.text}”"
 
 class stationshalUI:
     def __init__(self):
