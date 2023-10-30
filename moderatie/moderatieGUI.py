@@ -1,4 +1,3 @@
-import psycopg2
 from modereer import *
 from tkinter import * 
 from tkinter import messagebox
@@ -10,11 +9,19 @@ WHITE = "#FFF"
 GRAY = "#999"
 
 
-class ModeratieGUI():
+class ModeratieGUI:
     def __init__(self, naam_window: str = "moderatie"):
         self.moderatie = Modereer("berichten.csv")
 
         connectie_resultaat = self.moderatie.connect()
+
+        while connectie_resultaat == False: 
+            try_again = messagebox.askretrycancel("Database", f"Er kon geen connectie worden gemaakt met de database: {self.moderatie.error_str}")
+            if try_again: 
+                connectie_resultaat = self.moderatie.connect()
+            else: 
+                self.root.destroy()
+                connectie_resultaat = True
 
         # Window
         self.root = Tk()
@@ -42,14 +49,6 @@ class ModeratieGUI():
         self.login_wachtwoord = Entry(self.login_frame)
         self.btn_login = Button(self.login_frame, text="login", command=self.on_login)
         self.foutmelding_label = Label(self.login_frame, foreground=RED)
-
-        while connectie_resultaat == False: 
-            try_again = messagebox.askretrycancel("Database", f"Er kon geen connectie worden gemaakt met de database: {self.moderatie.error_str}")
-            if try_again: 
-                connectie_resultaat = self.moderatie.connect()
-            else: 
-                self.root.destroy()
-                connectie_resultaat = True
 
         self.toon_login()
 
