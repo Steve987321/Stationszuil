@@ -11,7 +11,6 @@ from tkinter import *
 station = "Groningen"
 
 # CSV_BESTAND_VELDEN = ["naam", "bericht", "station", "tijd", "datum"] 
-
 test_berichten = [
     {"naam": "anoniem1", "bericht": "bericht test bericht test1 .","station": "Groningen", "tijd": "12:13:31", "datum": "30-10-2023"},
     {"naam": "anoniem2", "bericht": "bericht test bericht test 2.","station": "Groningen", "tijd": "12:13:31", "datum": "30-10-2023"},
@@ -20,11 +19,25 @@ test_berichten = [
     {"naam": "anoniem5", "bericht": "bericht test bericht test 5.","station": "Groningen", "tijd": "12:15:31", "datum": "30-10-2023"},
 ]
 
+API_KEY = "70dc2324e9a7f4f81b9d37f2a1489ef6"
+
+def get_station_coords(station):
+    r = requests.get(f"http://api.openweathermap.org/geo/1.0/direct?q={station},31&limit=5&appid={API_KEY}")
+
+    if not r.ok:
+        print(f"Er is iets fout gegaan met het ophalen van het weer info {r.status_code}")
+
+    info = r.json()[0]
+
+    return (info["lat"], info["lon"])
+
 def get_station_weer_info():
-    r = requests.get(f"https://api.openweathermap.org/data/2.5/weather?lat=52.0&lon=5.19&units=metric&lang=nl&exclude=hourly,daily&appid=70dc2324e9a7f4f81b9d37f2a1489ef6")
+    coords = get_station_coords(station)
+
+    r = requests.get(f"https://api.openweathermap.org/data/2.5/weather?lat={coords[0]}&lon={coords[1]}&units=metric&lang=nl&exclude=hourly,daily&appid={API_KEY}")
 
     if not r.ok:   
-        print(f"Er is iets fout gegaan met het ophalen van de weer info {r.status_code}")      
+        print(f"Er is iets fout gegaan met het ophalen van het weer info {r.status_code}")      
         
     return dict(r.json())
 
@@ -72,7 +85,7 @@ class StationBerichtWidget:
         self.info["text"] = f"{bericht.naam} op {bericht.datum} om {bericht.tijd}"
         self.bericht["text"] = f"“{bericht.text}”"
 
-class stationshalUI:
+class StationshalUI:
     def __init__(self):
         # root 
         self.root = Tk()
@@ -121,7 +134,6 @@ class stationshalUI:
         try:
             self.temperatuur.set(f"{round(weer['main']['temp'])}°C")
             self.weer_beschrijving.set(weer["weather"][0]["description"])
-            print(weer)
             # self.regenmm.set(f"{round(weer['main']['temp'])}")
         except KeyError as e:
             print(f"Error bij lezen van weer info: {e}")
@@ -136,7 +148,7 @@ class stationshalUI:
 
 
 def main():
-    stationshal = stationshalUI()
+    stationshal = StationshalUI()
     stationshal.show()
 
 if __name__ == "__main__":
