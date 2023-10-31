@@ -123,9 +123,22 @@ class StationshalUI:
         self.root.resizable(False, False)
         self.root.geometry("700x600")
 
+        # image faciliteiten
+        self.faciliteiten_frame = Frame(self.root)
         self.img_bike = PhotoImage(file="opdracht/stationshalscherm/img_faciliteiten/img_ovfiets.png")
+        self.img_lift = PhotoImage(file="opdracht/stationshalscherm/img_faciliteiten/img_lift.png")
+        self.img_toilet = PhotoImage(file="opdracht/stationshalscherm/img_faciliteiten/img_toilet.png")
+        self.img_pr = PhotoImage(file="opdracht/stationshalscherm/img_faciliteiten/img_pr.png")
+
         self.img_bike = scale_img_down(self.img_bike, 0.5, 0.5)
-        self.faciliteiten_canvas = Label(self.root, image=self.img_bike)
+        self.img_lift = scale_img_down(self.img_lift, 0.5, 0.5)
+        self.img_toilet = scale_img_down(self.img_toilet, 0.5, 0.5)
+        self.img_pr = scale_img_down(self.img_pr, 0.5, 0.5)
+
+        self.bike_widget = Label(self.faciliteiten_frame, image=self.img_bike)
+        self.lift_widget = Label(self.faciliteiten_frame, image=self.img_lift)
+        self.pr_widget = Label(self.faciliteiten_frame, image=self.img_pr)
+        self.toilet_widget = Label(self.faciliteiten_frame, image=self.img_toilet)
 
         self.weer_info_frame = Frame(self.root)
         self.station_frame = Frame(self.root)
@@ -137,8 +150,12 @@ class StationshalUI:
         self.regenmm = StringVar()
 
         # root layout
-        self.faciliteiten_canvas.pack(anchor=CENTER, side=TOP)
         self.station_label.pack(anchor=CENTER, side=TOP)
+        self.bike_widget.pack(anchor=CENTER, side=LEFT)
+        self.lift_widget.pack(anchor=CENTER, side=LEFT)
+        self.pr_widget.pack(anchor=CENTER, side=LEFT)
+        self.toilet_widget.pack(anchor=CENTER, side=LEFT)
+        self.faciliteiten_frame.pack(anchor=CENTER, side=TOP)
         self.weer_info_frame.pack(side=LEFT, fill=BOTH, expand=True, padx=20, pady=20)
         self.station_frame.pack(side=RIGHT, fill=BOTH, expand=True, padx=20, pady=20)
 
