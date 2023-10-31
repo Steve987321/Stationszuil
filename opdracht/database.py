@@ -6,7 +6,6 @@ class StationsZuilDB():
     def __init__(self):
         self.con = None
         self.cursor = None
-
         self.error_str = None
         
     def connect(self):

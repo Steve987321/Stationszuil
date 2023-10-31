@@ -48,23 +48,26 @@ class Modereer():
     
     def beoordeel_bericht(self, goedgekeurd: bool):
         """Beoordeel bericht en stuur naar de database"""
-        beoordeling_nr = int(self.db.get_row("select count(*) from beoordeling")[0])
         tijd = datetime.now().time()
         datum = datetime.now().date()
 
         self.db.update_rows("""
-                            insert into beoordeling (beoordelingnr, is_goedgekeurd, datum, tijd, moderator_email)
-                            values (%s, %s, %s, %s, %s)
+                            insert into beoordeling (is_goedgekeurd, datum, tijd, moderator_email)
+                            values (%s, %s, %s, %s)
+
+                            returning beoordelingnr
                             """,
-                            (beoordeling_nr, goedgekeurd, datum, tijd, self.moderator_email))
+                            (goedgekeurd, datum, tijd, self.moderator_email))
         
-        berichtnr = int(self.db.get_row("select count(*) from bericht")[0])
+        beoordeling_nr = self.db.cursor.fetchone()[0]
+        
         bericht = self.berichten[self.index]
         self.db.update_rows("""
-                            insert into bericht (berichtnr, tekst, datum, tijd, naam, station, beoordelingnr)
-                            values (%s, %s, %s, %s, %s, %s, %s)
+                            insert into bericht (tekst, datum, tijd, naam, station, beoordelingnr)
+                            values (%s, %s, %s, %s, %s, %s)
                             """,
-                            (berichtnr, bericht["bericht"], bericht["datum"], bericht["tijd"], bericht["naam"], bericht["station"], beoordeling_nr))        
+                            (bericht["bericht"], bericht["datum"], bericht["tijd"], bericht["naam"], bericht["station"], beoordeling_nr)
+                            )        
         self.index += 1
         
     def update_bestand(self):
