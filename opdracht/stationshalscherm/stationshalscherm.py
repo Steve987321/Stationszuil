@@ -17,12 +17,15 @@ API_KEY = "70dc2324e9a7f4f81b9d37f2a1489ef6"
 db = database.StationsZuilDB()
 
 def scale_img_down(img: PhotoImage, factorx, factory):
+    assert factorx < 1 and factory < 1
+
     w = img.width()
     h = img.height()
 
     scaledw = int(w * factorx)
     scaledh = int(h * factory)
 
+    # pixel steps
     stepx = int(w / scaledw)
     stepy = int(h / scaledh)
 
