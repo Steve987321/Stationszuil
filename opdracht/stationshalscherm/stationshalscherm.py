@@ -26,7 +26,7 @@ def scale_img_down(img: PhotoImage, factorx, factory):
     stepx = int(w / scaledw)
     stepy = int(h / scaledh)
 
-    new_img = PhotoImage(width=w, height=h)
+    new_img = PhotoImage(width=scaledw, height=scaledh)
 
     for x in range(0, w, stepx):
         for y in range(0, h, stepy):
@@ -38,7 +38,7 @@ def scale_img_down(img: PhotoImage, factorx, factory):
                     hexstr = "0" + hexstr
                 rgbstr += hexstr
 
-            new_img.put(rgbstr, (x, y))
+            new_img.put(rgbstr, (int(x * factorx), int(y * factory)))
 
     return new_img
     
