@@ -25,7 +25,7 @@ def get_station_coords(station):
     r = requests.get(f"http://api.openweathermap.org/geo/1.0/direct?q={station},31&limit=5&appid={API_KEY}")
 
     if not r.ok:
-        print(f"Er is iets fout gegaan met het ophalen van het weer info {r.status_code}")
+        print(f"Er is iets fout gegaan met het ophalen van het weer info: {r.status_code}")
 
     info = r.json()[0]
 
@@ -37,7 +37,7 @@ def get_station_weer_info():
     r = requests.get(f"https://api.openweathermap.org/data/2.5/weather?lat={coords[0]}&lon={coords[1]}&units=metric&lang=nl&exclude=hourly,daily&appid={API_KEY}")
 
     if not r.ok:   
-        print(f"Er is iets fout gegaan met het ophalen van het weer info {r.status_code}")      
+        print(f"Er is iets fout gegaan met het ophalen van het weer info: {r.status_code}")      
         
     return dict(r.json())
 
