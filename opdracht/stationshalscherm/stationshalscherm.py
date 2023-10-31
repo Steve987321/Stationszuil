@@ -1,6 +1,11 @@
 import requests 
 import json 
 from tkinter import *
+import sys
+import os
+sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
+import database
+from datetime import datetime
 
 
 # laat de laatste 5 berichten zien (de meest recente) op chronologische volgorde nieuw naar oud 
@@ -9,17 +14,8 @@ from tkinter import *
 # doc: https://openweathermap.org/current
 
 station = "Groningen"
-
-# CSV_BESTAND_VELDEN = ["naam", "bericht", "station", "tijd", "datum"] 
-test_berichten = [
-    {"naam": "anoniem1", "bericht": "bericht test bericht test1 .","station": "Groningen", "tijd": "12:13:31", "datum": "30-10-2023"},
-    {"naam": "anoniem2", "bericht": "bericht test bericht test 2.","station": "Groningen", "tijd": "12:13:31", "datum": "30-10-2023"},
-    {"naam": "anoniem3", "bericht": "bericht test bericht test .3","station": "Groningen", "tijd": "12:13:31", "datum": "30-10-2023"},
-    {"naam": "anoniem4", "bericht": "bericht test bericht test4 .","station": "Groningen", "tijd": "12:14:31", "datum": "30-10-2023"},
-    {"naam": "anoniem5", "bericht": "bericht test bericht test 5.","station": "Groningen", "tijd": "12:15:31", "datum": "30-10-2023"},
-]
-
 API_KEY = "70dc2324e9a7f4f81b9d37f2a1489ef6"
+db = database.StationsZuilDB()
 
 def get_station_coords(station):
     r = requests.get(f"http://api.openweathermap.org/geo/1.0/direct?q={station},31&limit=5&appid={API_KEY}")
@@ -75,7 +71,12 @@ class StationBerichtWidget:
         # spacing 
         Label(self.root, text="").pack()
 
-    def update(self, bericht: StationBericht = None, dict = None):
+    def update(self, bericht: StationBericht = None, dict = None, maak_leeg = False):
+        if maak_leeg: 
+            self.info["text"] = ""
+            self.bericht["text"] = ""
+            return
+
         if bericht == None: 
             if dict == None: 
                 raise Exception("Bericht en dict argumenten kunnen niet leeg zijn")
@@ -126,6 +127,8 @@ class StationshalUI:
             StationBerichtWidget(self.station_frame),
         )
 
+        db.connect()
+
         self.update_weer_labels()
         self.update_bericht_labels()
         
@@ -140,8 +143,25 @@ class StationshalUI:
             return 
         
     def update_bericht_labels(self):
-        for i, bericht in enumerate(test_berichten):
-            self.bericht_labels[i].update(dict=bericht)
+        rows = db.get_rows(""" 
+                    select bericht.tekst, bericht.naam, bericht.datum, bericht.tijd, bericht.station from bericht
+                    inner join beoordeling on bericht.beoordelingnr = beoordeling.beoordelingnr
+                    where beoordeling.is_goedgekeurd = True
+                    order by bericht.datum desc, bericht.tijd desc
+                    limit 5
+                    """
+                    )
+        
+        for i, bericht in enumerate(self.bericht_labels):
+            if i > len(rows) - 1: # out of bounds check
+                bericht.update(maak_leeg=True)
+                continue
+
+            row = rows[i]
+            bericht = StationBericht(bericht=row[0], naam=row[1], datum=row[2], tijd=row[3].strftime("%H:%M"), station=row[4])
+            self.bericht_labels[i].update(bericht)
+
+        self.bericht_labels[i]
 
     def show(self): 
         self.root.mainloop()
