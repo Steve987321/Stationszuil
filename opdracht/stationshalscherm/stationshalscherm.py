@@ -78,7 +78,7 @@ class StationBerichtWidget:
     def update(self, bericht: StationBericht = None, dict = None):
         if bericht == None: 
             if dict == None: 
-                raise Exception("bericht en dict argumenten kunnen niet leeg zijn")
+                raise Exception("Bericht en dict argumenten kunnen niet leeg zijn")
 
             bericht = StationBericht(dict)
 
@@ -89,7 +89,7 @@ class StationshalUI:
     def __init__(self):
         # root 
         self.root = Tk()
-        self.root.title("stationshalscherm")
+        self.root.title("Stationshalscherm")
         self.root.resizable(False, False)
         self.root.geometry("700x600")
 
