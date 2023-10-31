@@ -1,5 +1,4 @@
 import requests 
-import json 
 from tkinter import *
 import sys
 import os
@@ -16,6 +15,33 @@ from datetime import datetime
 station = "Groningen"
 API_KEY = "70dc2324e9a7f4f81b9d37f2a1489ef6"
 db = database.StationsZuilDB()
+
+def scale_img_down(img: PhotoImage, factorx, factory):
+    w = img.width()
+    h = img.height()
+
+    scaledw = int(w * factorx)
+    scaledh = int(h * factory)
+
+    stepx = int(w / scaledw)
+    stepy = int(h / scaledh)
+
+    new_img = PhotoImage(width=w, height=h)
+
+    for x in range(0, w, stepx):
+        for y in range(0, h, stepy):
+            rgb = img.get(x, y)
+            rgbstr = "#"
+            for i in rgb: 
+                hexstr = hex(i)[2:]
+                if len(hexstr) == 1:
+                    hexstr = "0" + hexstr
+                rgbstr += hexstr
+
+            new_img.put(rgbstr, (x, y))
+
+    return new_img
+    
 
 def get_station_coords(station):
     r = requests.get(f"http://api.openweathermap.org/geo/1.0/direct?q={station},31&limit=5&appid={API_KEY}")
@@ -94,6 +120,10 @@ class StationshalUI:
         self.root.resizable(False, False)
         self.root.geometry("700x600")
 
+        self.img_bike = PhotoImage(file="opdracht/stationshalscherm/img_faciliteiten/img_ovfiets.png")
+        self.img_bike = scale_img_down(self.img_bike, 0.5, 0.5)
+        self.faciliteiten_canvas = Label(self.root, image=self.img_bike)
+
         self.weer_info_frame = Frame(self.root)
         self.station_frame = Frame(self.root)
         self.station_label = Label(self.root, text=station, font="Courier 20 normal")
@@ -103,7 +133,8 @@ class StationshalUI:
         self.weer_beschrijving = StringVar()
         self.regenmm = StringVar()
 
-        # props 
+        # root layout
+        self.faciliteiten_canvas.pack(anchor=CENTER, side=TOP)
         self.station_label.pack(anchor=CENTER, side=TOP)
         self.weer_info_frame.pack(side=LEFT, fill=BOTH, expand=True, padx=20, pady=20)
         self.station_frame.pack(side=RIGHT, fill=BOTH, expand=True, padx=20, pady=20)
