@@ -38,3 +38,4 @@ def sla_bericht_op(bericht: dict):
             writer.writeheader()
 
         writer.writerow(bericht)
+        

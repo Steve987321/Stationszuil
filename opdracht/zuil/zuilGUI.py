@@ -23,7 +23,7 @@ class ZuilGUI():
         self.invoer_naam = Entry(self.invoer_frame)
         self.invoer_bericht_label = Label(self.invoer_frame, text="bericht")
         self.invoer_bericht = Text(self.invoer_frame, highlightthickness=1, borderwidth=1)
-        self.invoer_limiet_label = Label(self.invoer_frame, wraplength=350, fg=GRAY,text=f"0/{zuil.MAX_BERICHT_LENGTE}")
+        self.invoer_limiet_label = Label(self.invoer_frame, wraplength=350, fg=GRAY, text=f"0/{zuil.MAX_BERICHT_LENGTE}")
         self.btn_verstuur = Button(self.invoer_frame, text="verstuur", command=self.verstuur_bericht)
 
         # Widget props
@@ -93,20 +93,19 @@ class ZuilGUI():
         tijd = datetime.now().time()
         datum = datetime.now().date()
 
-        opgeslagen_bericht =  {"naam": naam, "bericht": bericht, "tijd": tijd, "station": station, "datum": datum}
+        opgeslagen_bericht = {"naam": naam, "bericht": bericht, "tijd": tijd, "station": station, "datum": datum}
 
         zuil.sla_bericht_op(opgeslagen_bericht)
 
         messagebox.showinfo("Verstuurd", "Het bericht is verstuurd en in afwachting tot beoordeling.")
 
     def show(self):
-        """Voert window uit met de gemaakte widgets"""
         self.root.mainloop()
 
 
 def main():
-    GUI = ZuilGUI()
-    GUI.show()
+    gui = ZuilGUI()
+    gui.show()
 
 if __name__ == "__main__":
     main()
