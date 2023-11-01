@@ -6,7 +6,6 @@ sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 import database
 from datetime import datetime
 
-
 # laat de laatste 5 berichten zien (de meest recente) op chronologische volgorde nieuw naar oud 
 # voor elk bericht pak het station en daarvan de faciliteiten (station_service table)
 # voor het station zelf waar het scherm staat, laat de weersvoorspelling zien https://openweathermap.org/
@@ -40,7 +39,7 @@ def scale_img_down(img: PhotoImage, factorx, factory):
                 if len(hexstr) == 1:
                     hexstr = "0" + hexstr
                 rgbstr += hexstr
-
+            # rgb can't parse color "255"
             new_img.put(rgbstr, (int(x * factorx), int(y * factory)))
 
     return new_img
@@ -65,6 +64,15 @@ def get_station_weer_info():
         print(f"Er is iets fout gegaan met het ophalen van het weer info: {r.status_code}")      
         
     return dict(r.json())
+
+def get_station_faciliteiten():
+    rows = db.get_row("""
+                select ov_bike, elevator, toilet, park_and_ride from station_service
+                where station_city = %s    
+                """,
+                (station,)) # tuple 
+
+    return {"fiets": rows[0], "lift": rows[1], "toilet": rows[2], "pr": rows[3]}
 
 def get_stations():
     with open("stations.txt", 'r') as f:
@@ -125,6 +133,7 @@ class StationshalUI:
 
         # image faciliteiten
         self.faciliteiten_frame = Frame(self.root)
+
         self.img_bike = PhotoImage(file="opdracht/stationshalscherm/img_faciliteiten/img_ovfiets.png")
         self.img_lift = PhotoImage(file="opdracht/stationshalscherm/img_faciliteiten/img_lift.png")
         self.img_toilet = PhotoImage(file="opdracht/stationshalscherm/img_faciliteiten/img_toilet.png")
@@ -150,11 +159,7 @@ class StationshalUI:
         self.regenmm = StringVar()
 
         # root layout
-        self.station_label.pack(anchor=CENTER, side=TOP)
-        self.bike_widget.pack(anchor=CENTER, side=LEFT)
-        self.lift_widget.pack(anchor=CENTER, side=LEFT)
-        self.pr_widget.pack(anchor=CENTER, side=LEFT)
-        self.toilet_widget.pack(anchor=CENTER, side=LEFT)
+        self.station_label.pack(side=TOP)
         self.faciliteiten_frame.pack(anchor=CENTER, side=TOP)
         self.weer_info_frame.pack(side=LEFT, fill=BOTH, expand=True, padx=20, pady=20)
         self.station_frame.pack(side=RIGHT, fill=BOTH, expand=True, padx=20, pady=20)
@@ -182,6 +187,7 @@ class StationshalUI:
 
         self.update_weer_labels()
         self.update_bericht_labels()
+        self.update_faciliteiten()
         
     def update_weer_labels(self):
         weer = get_station_weer_info()
@@ -213,6 +219,18 @@ class StationshalUI:
             self.bericht_labels[i].update(bericht)
 
         self.bericht_labels[i]
+
+    def update_faciliteiten(self):
+        faciliteiten = get_station_faciliteiten()  
+        
+        if faciliteiten["fiets"]:
+            self.bike_widget.pack(side=TOP)
+        if faciliteiten["lift"]:
+            self.lift_widget.pack(side=LEFT)
+        if faciliteiten["toilet"]:
+            self.toilet_widget.pack(side=LEFT)
+        if faciliteiten["pr"]:
+            self.pr_widget.pack(side=LEFT)
 
     def show(self): 
         self.root.mainloop()
