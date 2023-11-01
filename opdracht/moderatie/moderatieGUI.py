@@ -46,7 +46,7 @@ class ModeratieGUI:
         # login scherm 
         self.login_frame = LabelFrame(self.root, text="login", height=400, width=300)
         self.login_email = Entry(self.login_frame)
-        self.login_wachtwoord = Entry(self.login_frame)
+        self.login_wachtwoord = Entry(self.login_frame, show='*')
         self.btn_login = Button(self.login_frame, text="login", command=self.on_login)
         self.foutmelding_label = Label(self.login_frame, foreground=RED)
 
