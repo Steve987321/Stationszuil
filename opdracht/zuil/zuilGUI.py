@@ -11,14 +11,17 @@ GRAY = "#999"
 BLACK = "#000"
 
 class ZuilGUI():
+    """Zuil window en UI om berichten te plaatsen op een random station"""
     def __init__(self, naam_window: str = "zuil"):
         # Window
         self.root = Tk()
         self.root.title(naam_window)
         self.root.resizable(False, False)
         
-        # Frame & widgets
+        # Frame
         self.invoer_frame = Frame(self.root, height=300, width=450)
+
+        # Invoer frame widgets
         self.invoer_naam_label = Label(self.invoer_frame, text="naam")
         self.invoer_naam = Entry(self.invoer_frame)
         self.invoer_bericht_label = Label(self.invoer_frame, text="bericht")
@@ -26,25 +29,24 @@ class ZuilGUI():
         self.invoer_limiet_label = Label(self.invoer_frame, wraplength=350, fg=GRAY, text=f"0/{zuil.MAX_BERICHT_LENGTE}")
         self.btn_verstuur = Button(self.invoer_frame, text="verstuur", command=self.verstuur_bericht)
 
-        # Widget props
+        # Widget props en layout
         self.invoer_naam_label.place(relx=0.2, rely=0.12, width=350, anchor=CENTER)
-
         self.invoer_naam.place(relx=0.5, rely=0.2, width=350, anchor=CENTER)
+        self.invoer_bericht_label.place(relx=0.2, rely=0.31, width=350, anchor=CENTER)
+        self.invoer_bericht.place(relx=0.5, rely=0.6, height=150, width=350, anchor=CENTER)
+        self.btn_verstuur.place(relx=0.5, rely=0.9, height=20, width=80, anchor=CENTER)
+        self.invoer_limiet_label.place(relx=0.8, rely=0.9, anchor=CENTER)
+
         self.invoer_naam.bind("<FocusIn>", self.on_naam_focus_in)
         self.invoer_naam.bind("<FocusOut>", self.on_naam_focus_out)
         self.invoer_naam.insert(0, "anoniem")
         self.invoer_naam.config(fg=GRAY)
 
-        self.invoer_bericht_label.place(relx=0.2, rely=0.31, width=350, anchor=CENTER)
-        self.invoer_bericht.place(relx=0.5, rely=0.6, height=150, width=350, anchor=CENTER)
         self.invoer_bericht.bind("<KeyRelease>", self.check_bericht_limiet)
-
-        self.btn_verstuur.place(relx=0.5, rely=0.9, height=20, width=80, anchor=CENTER)
 
         self.invoer_frame.grid_propagate(False)
         self.invoer_frame.pack()
         
-        self.invoer_limiet_label.place(relx=0.8, rely=0.9, anchor=CENTER)
 
     def on_naam_focus_in(self, _):
         """Naam input on focus event
@@ -67,11 +69,14 @@ class ZuilGUI():
     def check_bericht_limiet(self, _):
         """Bericht input on key release event
         
-        Laat weten dat de gebruiker dat de er meer dan 140 karakters in het bericht zitten wat niet kan.
+        Laat weten dat de gebruiker dat er meer dan 140 karakters in het bericht zitten wat niet kan.
         Disable ook vestuur button. 
         """
+        # update bericht lengte widget
         invoer_len = len(self.invoer_bericht.get("1.0", "end-1c"))
         self.invoer_limiet_label.configure(text=f"{invoer_len}/{zuil.MAX_BERICHT_LENGTE}")
+
+        # check of het letter limiet is bereikt
         if invoer_len > zuil.MAX_BERICHT_LENGTE:
             self.invoer_limiet_label.configure(text=f"limiet bereikt {invoer_len}/{zuil.MAX_BERICHT_LENGTE}")
             self.invoer_limiet_label.configure(fg=RED)
@@ -87,6 +92,7 @@ class ZuilGUI():
         
         Verstuur het bericht naar het csv bestand en laat bericht zien
         """
+        # pak info van de widgets
         naam = self.invoer_naam.get()
         bericht = self.invoer_bericht.get("1.0", "end-1c")
         station = zuil.get_random_station()

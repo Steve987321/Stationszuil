@@ -34,6 +34,8 @@ def sla_bericht_op(bericht: dict):
     """"Slaat het bericht op in het bestand via append."""
     with open(BESTAND_NAAM, newline='', mode="a+") as f:
         writer = csv.DictWriter(f, CSV_BESTAND_VELDEN)
+
+        # check of het nog geen csv header heeft en dus leeg is
         if f.tell() == 0:
             writer.writeheader()
 

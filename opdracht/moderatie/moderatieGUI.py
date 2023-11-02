@@ -10,6 +10,7 @@ GRAY = "#999"
 
 
 class ModeratieGUI:
+    """Moderatie window en UI voor beoordelen van berichten"""
     def __init__(self, naam_window: str = "moderatie"):
         self.moderatie = Modereer("berichten.csv")
 
@@ -23,7 +24,7 @@ class ModeratieGUI:
                 self.root = None
                 return
             
-        # Window
+        # window
         self.root = Tk()
         self.root.title(naam_window)
         self.root.resizable(False, False)
@@ -53,6 +54,7 @@ class ModeratieGUI:
         self.toon_login()
 
     def toon_login(self):
+        """Laat de login widgets zien"""
         # verberg moderatie scherm
         self.info_frame.pack_forget()
 
@@ -66,6 +68,7 @@ class ModeratieGUI:
         self.foutmelding_label.pack()
 
     def toon_moderatie(self):
+        """Laat de moderatie widgets zien"""
         # verberg login scherm 
         self.login_frame.pack_forget()
 
@@ -83,6 +86,7 @@ class ModeratieGUI:
         self.btn_update.pack(padx=10, anchor=CENTER)
     
     def on_login(self):
+        """login knop press, probeer in te loggen"""
         if self.moderatie.login(self.login_email.get(), self.login_wachtwoord.get()):
             self.toon_moderatie()
             self.update_bericht_labels()
@@ -90,20 +94,25 @@ class ModeratieGUI:
             self.foutmelding_label["text"] = "Fout wachtwoord of email adress."
 
     def on_goedkeuring(self):
+        """goedgekeeurd bericht knop press"""
         self.moderatie.beoordeel_bericht(True)
         self.update_bericht_labels()
         pass
 
     def on_afkeuring(self):
+        """afgekeurd bericht knop press"""
         self.moderatie.beoordeel_bericht(False)
         self.update_bericht_labels()
         pass
 
     def update_bericht_labels(self):
+        """update csv bestand knop press"""
         bericht_info = self.moderatie.geef_bericht()
         
+        # zodat we de widget kunnen aanpassen
         self.bericht["state"] = NORMAL
 
+        # geeft een string als er geen berichten meer zijn om te beoordelen
         if isinstance(bericht_info, str):
             self.naam["text"] = "naam: -"
             self.station["text"] = "station: -"
@@ -113,6 +122,7 @@ class ModeratieGUI:
             self.bericht["state"] = DISABLED
             return
         
+        # update widgets met het nieuwe bericht
         naam = bericht_info["naam"]
         tijd = bericht_info["tijd"]
         station = bericht_info["station"]
@@ -130,18 +140,20 @@ class ModeratieGUI:
         self.moderatie.update_bestand()
 
     def show(self):
+        # check of de database connectie fout ging
         if self.root == None: 
             return
 
         self.root.mainloop()
 
-        self.on_update_csv()
-        self.moderatie.disconnect()
-
 
 def main():
     GUI = ModeratieGUI()
     GUI.show()
+
+    # bij afsluiten update en disconnect van database
+    GUI.on_update_csv()
+    GUI.moderatie.disconnect()
 
 
 if __name__ == "__main__":
