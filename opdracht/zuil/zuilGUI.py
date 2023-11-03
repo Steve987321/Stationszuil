@@ -102,6 +102,15 @@ class ZuilGUI:
 
         zuil.sla_bericht_op(opgeslagen_bericht)
 
+        # leeg invulvelden
+        self.invoer_naam.delete(0, END)
+        self.invoer_naam.insert(0, "anoniem")
+        self.invoer_naam.config(fg=GRAY)
+
+        self.invoer_bericht.delete("1.0", END)
+
+        self.invoer_limiet_label["text"] = f"0/{zuil.MAX_BERICHT_LENGTE}"
+
         messagebox.showinfo("Verstuurd", "Het bericht is verstuurd en in afwachting tot beoordeling.")
 
     def show(self):
