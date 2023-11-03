@@ -95,7 +95,11 @@ class ZuilGUI:
         naam = self.invoer_naam.get()
         bericht = self.invoer_bericht.get("1.0", "end-1c")
 
-        if len(bericht) <= 1:
+        if len(bericht.strip(naam)) <= 1:
+            messagebox.showinfo("Bericht kon niet worden verstuurd", "Naam is te klein")
+            return
+
+        if len(bericht.strip()) <= 1:
             messagebox.showinfo("Bericht kon niet worden verstuurd", "Het bericht is te klein")
             return
 
