@@ -94,6 +94,11 @@ class ZuilGUI:
         # pak info van de widgets
         naam = self.invoer_naam.get()
         bericht = self.invoer_bericht.get("1.0", "end-1c")
+
+        if len(bericht) <= 1:
+            messagebox.showinfo("Bericht kon niet worden verstuurd", "Het bericht is te klein")
+            return
+
         station = zuil.get_random_station()
         tijd = datetime.now().time()
         datum = datetime.now().date()
