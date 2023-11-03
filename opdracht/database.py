@@ -1,8 +1,9 @@
 import psycopg2
-import psycopg2.extras # DictCursor
-import psycopg2.errors # Logging errors
+import psycopg2.extras  # DictCursor
+import psycopg2.errors  # Logging errors
 
-class StationsZuilDB():
+
+class StationsZuilDB:
     """De stationzuil database via psycopg2 dat wordt gebruikt door bijna alle modules"""
     def __init__(self):
         self.con = None

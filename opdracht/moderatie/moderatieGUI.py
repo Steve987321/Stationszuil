@@ -12,12 +12,14 @@ GRAY = "#999"
 class ModeratieGUI:
     """Moderatie window en UI voor beoordelen van berichten"""
     def __init__(self, naam_window: str = "moderatie"):
-        self.moderatie = Modereer("berichten.csv")
+        self.moderatie = Modereer("../../berichten.csv")
 
         connectie_resultaat = self.moderatie.connect()
 
         while connectie_resultaat == False: 
-            try_again = messagebox.askretrycancel("Database", f"Er kon geen connectie worden gemaakt met de database: {self.moderatie.error_str}")
+            try_again = messagebox.askretrycancel(
+                "Database",
+                f"Er kon geen connectie worden gemaakt met de database: {self.moderatie.error_str}")
             if try_again: 
                 connectie_resultaat = self.moderatie.connect()
             else: 
@@ -86,7 +88,7 @@ class ModeratieGUI:
         self.btn_update.pack(padx=10, anchor=CENTER)
     
     def on_login(self):
-        """login knop press, probeer in te loggen"""
+        """Login knop press, probeer in te loggen"""
         if self.moderatie.login(self.login_email.get(), self.login_wachtwoord.get()):
             self.toon_moderatie()
             self.update_bericht_labels()
@@ -94,19 +96,19 @@ class ModeratieGUI:
             self.foutmelding_label["text"] = "Fout wachtwoord of email adress."
 
     def on_goedkeuring(self):
-        """goedgekeeurd bericht knop press"""
+        """Goedgekeeurd bericht knop press"""
         self.moderatie.beoordeel_bericht(True)
         self.update_bericht_labels()
         pass
 
     def on_afkeuring(self):
-        """afgekeurd bericht knop press"""
+        """Afgekeurd bericht knop press"""
         self.moderatie.beoordeel_bericht(False)
         self.update_bericht_labels()
         pass
 
     def update_bericht_labels(self):
-        """update csv bestand knop press"""
+        """Update csv bestand knop press"""
         bericht_info = self.moderatie.geef_bericht()
         
         # zodat we de widget kunnen aanpassen
@@ -148,12 +150,12 @@ class ModeratieGUI:
 
 
 def main():
-    GUI = ModeratieGUI()
-    GUI.show()
+    gui = ModeratieGUI()
+    gui.show()
 
     # bij afsluiten update en disconnect van database
-    GUI.on_update_csv()
-    GUI.moderatie.disconnect()
+    gui.on_update_csv()
+    gui.moderatie.disconnect()
 
 
 if __name__ == "__main__":

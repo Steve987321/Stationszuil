@@ -10,7 +10,7 @@ WHITE = "#FFF"
 GRAY = "#999"
 BLACK = "#000"
 
-class ZuilGUI():
+class ZuilGUI:
     """Zuil window en UI om berichten te plaatsen op een random station"""
     def __init__(self, naam_window: str = "zuil"):
         # Window
@@ -46,7 +46,6 @@ class ZuilGUI():
 
         self.invoer_frame.grid_propagate(False)
         self.invoer_frame.pack()
-        
 
     def on_naam_focus_in(self, _):
         """Naam input on focus event
@@ -112,6 +111,7 @@ class ZuilGUI():
 def main():
     gui = ZuilGUI()
     gui.show()
+
 
 if __name__ == "__main__":
     main()

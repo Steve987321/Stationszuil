@@ -1,13 +1,9 @@
-import psycopg2
-import psycopg2.extras  # DictCursor
 import csv
-import sys
-import os
 from datetime import datetime
-sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
-from database import *
+from opdracht import database
 
-class Modereer():
+
+class Modereer:
     """Handelt de moderatie voor berichten"""
     def __init__(self, berichten_bestand_naam):
         self.bestand = berichten_bestand_naam
@@ -19,10 +15,11 @@ class Modereer():
         try: 
             with open(self.bestand) as f:
                 self.berichten = list(csv.DictReader(f))
-        except Exception as e: 
+        except Exception as e:
             print(f"Error tijdens het openen van {berichten_bestand_naam}: {e}")
+            return
         
-        self.db = StationsZuilDB()
+        self.db = database.StationsZuilDB()
 
     def connect(self):
         """Maak connectie met de stationzuil database"""
@@ -77,7 +74,14 @@ class Modereer():
                             insert into bericht (tekst, datum, tijd, naam, station, beoordelingnr)
                             values (%s, %s, %s, %s, %s, %s)
                             """,
-                            (bericht["bericht"], bericht["datum"], bericht["tijd"], bericht["naam"], bericht["station"], beoordeling_nr)
+                            (
+                                bericht["bericht"],
+                                bericht["datum"],
+                                bericht["tijd"],
+                                bericht["naam"],
+                                bericht["station"],
+                                beoordeling_nr
+                            )
                             )      
           
         self.index += 1

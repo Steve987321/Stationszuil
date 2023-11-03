@@ -1,13 +1,14 @@
 from tkinter import *
 from stationinfo import *
 
+
 def scale_img_down(img: PhotoImage, factorx, factory):
     """Geeft een verkleinde PhotoImage terug met de gegeven factoren
     
     Args:
         img: image die wordt verkleint
         factorx: de breedte factor van de nieuwe image, moet kleiner zijn dan 1
-        factorx: de hoogte factor van de nieuwe image, moet kleiner zijn dan 1
+        factory: de hoogte factor van de nieuwe image, moet kleiner zijn dan 1
     """
     assert factorx < 1 and factory < 1
 
@@ -34,7 +35,7 @@ def scale_img_down(img: PhotoImage, factorx, factory):
             # new_img.put rgb can't parse color "255"
 
             rgbstr = "#"
-            for i in rgb: 
+            for i in rgb:
                 hexstr = hex(i)[2:]
                 if len(hexstr) == 1:
                     hexstr = "0" + hexstr
@@ -45,8 +46,10 @@ def scale_img_down(img: PhotoImage, factorx, factory):
 
     return new_img
 
-class StationBerichtWidget: 
+
+class StationBerichtWidget:
     """Label en Text widget voor stationsinhoud"""
+
     def __init__(self, root: Misc):
         self.root = root
         self.bericht = Label(root)
@@ -57,30 +60,32 @@ class StationBerichtWidget:
         # spacing 
         Label(self.root, text="").pack()
 
-    def update(self, bericht: StationBericht = None, dict = None, maak_leeg = False):
+    def update(self, bericht: StationBericht = None, dictstr=None, maak_leeg=False):
         """Update bericht inhoud
         
         Args:
             bericht: Het nieuwe bericht
-            dict: Het nieuwe bericht maar dan via een dictionary
+            dictstr: Het nieuwe bericht maar dan via een dictionary
             maak_leeg: Leeg de widget inhoud
         """
-        if maak_leeg: 
+        if maak_leeg:
             self.info["text"] = ""
             self.bericht["text"] = ""
             return
 
-        if bericht == None: 
-            if dict == None: 
+        if bericht == None:
+            if dictstr == None:
                 raise Exception("Bericht en dict argumenten kunnen niet leeg zijn")
 
-            bericht = StationBericht(dict)
+            bericht = StationBericht(dictstr)
 
         self.info["text"] = f"{bericht.naam} op {bericht.datum} om {bericht.tijd}"
         self.bericht["text"] = f"“{bericht.text}”"
 
+
 class StationshalUI:
     """Stationshalscherm UI en window"""
+
     def __init__(self):
         # root 
         self.root = Tk()
@@ -91,14 +96,14 @@ class StationshalUI:
         # root frames
         self.weer_info_frame = Frame(self.root)
         self.station_frame = Frame(self.root)
-        self.station_label = Label(self.root, text=station, font="Courier 20 normal")
+        self.station_label = Label(self.root, text=stationshalscherm_plek, font="Courier 20 normal")
         self.faciliteiten_frame = Frame(self.root)
 
         # image faciliteiten
-        self.img_bike = PhotoImage(file="opdracht/stationshalscherm/img_faciliteiten/img_ovfiets.png")
-        self.img_lift = PhotoImage(file="opdracht/stationshalscherm/img_faciliteiten/img_lift.png")
-        self.img_toilet = PhotoImage(file="opdracht/stationshalscherm/img_faciliteiten/img_toilet.png")
-        self.img_pr = PhotoImage(file="opdracht/stationshalscherm/img_faciliteiten/img_pr.png")
+        self.img_bike = PhotoImage(file="img_faciliteiten/img_ovfiets.png")
+        self.img_lift = PhotoImage(file="img_faciliteiten/img_lift.png")
+        self.img_toilet = PhotoImage(file="img_faciliteiten/img_toilet.png")
+        self.img_pr = PhotoImage(file="img_faciliteiten/img_pr.png")
 
         # verklein 
         self.img_bike = scale_img_down(self.img_bike, 0.5, 0.5)
@@ -125,7 +130,8 @@ class StationshalUI:
 
         # weer info frame
         self.temp_label = Label(self.weer_info_frame, textvariable=self.temperatuur, font="Courier 30 normal")
-        self.bewolktheid_label = Label(self.weer_info_frame, textvariable=self.weer_beschrijving, font="Courier 20 normal")
+        self.bewolktheid_label = Label(self.weer_info_frame, textvariable=self.weer_beschrijving,
+                                       font="Courier 20 normal")
         self.regen_label = Label(self.weer_info_frame, textvariable=self.regenmm, font="Courier 20 normal")
 
         # layout 
@@ -149,7 +155,7 @@ class StationshalUI:
         self.update_weer_labels()
         self.update_bericht_labels()
         self.update_faciliteiten()
-        
+
     def update_weer_labels(self):
         """Update weer info van de station"""
         weer = get_station_weer_info()
@@ -157,10 +163,13 @@ class StationshalUI:
             # TODO: andere info toevoegen
             self.temperatuur.set(f"{round(weer['main']['temp'])}°C")
             self.weer_beschrijving.set(weer["weather"][0]["description"])
+            if "rain" in weer.keys():
+                self.regenmm = weer["rain"]["1h"]
+
         except KeyError as e:
             print(f"Error bij lezen van weer info: {e}")
-            return 
-        
+            return
+
     def update_bericht_labels(self):
         """Update de labels met de nieuwste 5 berichten van de station"""
         rows = db.get_rows(""" 
@@ -170,8 +179,8 @@ class StationshalUI:
                     order by bericht.datum desc, bericht.tijd desc
                     limit 5
                     """
-                    )
-        
+                           )
+
         for i, bericht in enumerate(self.bericht_labels):
             # check bij minder dan 5 berichten op station
             if i > len(rows) - 1:
@@ -181,15 +190,14 @@ class StationshalUI:
 
             # vul de inhoud met het bericht
             row = rows[i]
-            bericht = StationBericht(bericht=row[0], naam=row[1], datum=row[2], tijd=row[3].strftime("%H:%M"), station=row[4])
+            bericht = StationBericht(bericht=row[0], naam=row[1], datum=row[2], tijd=row[3].strftime("%H:%M"),
+                                     station=row[4])
             self.bericht_labels[i].update(bericht)
-
-        self.bericht_labels[i]
 
     def update_faciliteiten(self):
         """Laat de beschikbare faciliteiten op het station zien, roep deze functie maar 1 keer in het begin op"""
-        faciliteiten = get_station_faciliteiten()  
-        
+        faciliteiten = get_station_faciliteiten()
+
         if faciliteiten["fiets"]:
             self.bike_widget.pack(side=TOP)
         if faciliteiten["lift"]:
@@ -199,13 +207,14 @@ class StationshalUI:
         if faciliteiten["pr"]:
             self.pr_widget.pack(side=LEFT)
 
-    def show(self): 
+    def show(self):
         self.root.mainloop()
 
 
 def main():
     stationshal = StationshalUI()
     stationshal.show()
+
 
 if __name__ == "__main__":
     main()
