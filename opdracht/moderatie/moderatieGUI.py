@@ -81,7 +81,7 @@ class BerichtPreviewWidget(LabelFrame):
 
 class TotaalOverzichtGUI:
     """Laat een totaal overzicht zien van alle beoordeelde berichten"""
-    def __init__(self):
+    def __init__(self, db: database.StationsZuilDB = None):
         self.paginas = []
 
         # layout is in rijen met elk 3 berichten (Frame met 3 Frames)
@@ -92,18 +92,22 @@ class TotaalOverzichtGUI:
         self.pagina = 0
 
         # database connectie
-        self.db = database.StationsZuilDB()
-        connectie_resultaat = self.db.connect()
 
-        while connectie_resultaat == False:
-            try_again = messagebox.askretrycancel(
-                "Database",
-                f"Er kon geen connectie worden gemaakt met de database: {self.db.error_str}")
-            if try_again:
-                connectie_resultaat = self.db.connect()
-            else:
-                self.root = None
-                return
+        if db == None:
+            self.db = database.StationsZuilDB()
+            connectie_resultaat = self.db.connect()
+
+            while connectie_resultaat == False:
+                try_again = messagebox.askretrycancel(
+                    "Database",
+                    f"Er kon geen connectie worden gemaakt met de database: {self.db.error_str}")
+                if try_again:
+                    connectie_resultaat = self.db.connect()
+                else:
+                    self.root = None
+                    return
+        else:
+            self.db = db
 
         db_berichten = self.db.get_rows("""
         select bericht.tekst, bericht.naam, bericht.station, bericht.datum, bericht.tijd, beoordeling.is_goedgekeurd, beoordeling.moderator_email from bericht
@@ -124,7 +128,7 @@ class TotaalOverzichtGUI:
             for bericht in db_berichten:
                 self.paginas[pagina].append(bericht)
 
-        self.root = Tk()
+        self.root = Toplevel()
         self.root.title("Totaal Overzicht")
         self.root.resizable(False, False)
         self.root.geometry("500x600")
@@ -220,15 +224,15 @@ class TotaalOverzichtGUI:
 
 
 # temp
-g = TotaalOverzichtGUI()
-g.show()
-
+# g = TotaalOverzichtGUI()
+# g.show()
 
 class ModeratieGUI:
     """Moderatie window en UI voor beoordelen van berichten"""
 
     def __init__(self, naam_window: str = "moderatie"):
         self.moderatie = Modereer("../../berichten.csv")
+        self.overzicht_scherm = None
 
         connectie_resultaat = self.moderatie.connect()
 
@@ -261,6 +265,7 @@ class ModeratieGUI:
         self.btn_goedkeuren = Button(self.moderatie_frame, text="goedkeuren", command=self.on_goedkeuring)
         self.btn_afkeuren = Button(self.moderatie_frame, text="afkeuren", command=self.on_afkeuring)
         self.btn_update = Button(self.moderatie_frame, text="update csv", command=self.on_update_csv)
+        self.btn_overzicht = Button(self.moderatie_frame, text="toon overzicht", command=self.on_toon_overzicht)
 
         # login scherm 
         self.login_frame = LabelFrame(self.root, text="login", height=400, width=300)
@@ -302,6 +307,7 @@ class ModeratieGUI:
         self.btn_goedkeuren.pack(padx=10, anchor=CENTER)
         self.btn_afkeuren.pack(padx=10, anchor=CENTER)
         self.btn_update.pack(padx=10, anchor=CENTER)
+        self.btn_overzicht.pack()
 
     def on_login(self):
         """Login knop press, probeer in te loggen"""
@@ -322,6 +328,9 @@ class ModeratieGUI:
         self.moderatie.beoordeel_bericht(False)
         self.update_bericht_labels()
         pass
+
+    def on_toon_overzicht(self):
+        self.overzicht_scherm = TotaalOverzichtGUI(self.moderatie.db)
 
     def update_bericht_labels(self):
         """Update csv bestand knop press"""
