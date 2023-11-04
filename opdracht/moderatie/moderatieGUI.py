@@ -84,10 +84,17 @@ class TotaalOverzichtGUI:
     Laat een totaal overzicht zien van alle beoordeelde berichten,
     er kan als nodig wijzigingen worden gebracht aan de berichten
     """
-
     def __init__(self):
-        self.db_berichten_group_frames = None
+        self.paginas = []
 
+        # layout is in rijen met elk 3 berichten (Frame met 3 Frames)
+        # max 5 rijen in 600 hoogte
+        self.db_bericht_group_frame = []
+
+        # geselecteerde pagina
+        self.pagina = 0
+
+        # database connectie
         self.db = database.StationsZuilDB()
         connectie_resultaat = self.db.connect()
 
@@ -106,35 +113,81 @@ class TotaalOverzichtGUI:
         inner join beoordeling on bericht.beoordelingnr = beoordeling.beoordelingnr
         """)
 
-        paginas = []
         pagina = 0
 
         # groepeer de berichten in groepen van 15
         if len(db_berichten) > 15:
             for i in range(15, len(db_berichten), 15):
-                paginas.append(db_berichten[:i])
+                self.paginas.append(db_berichten[:i])
                 db_berichten = db_berichten[i:]
                 pagina += 1
 
         if len(db_berichten) >= 0:
-            paginas.append([])
+            self.paginas.append([])
             for bericht in db_berichten:
-                paginas[pagina].append(bericht)
+                self.paginas[pagina].append(bericht)
 
         self.root = Tk()
         self.root.title("Totaal Overzicht")
         self.root.resizable(False, False)
         self.root.geometry("500x600")
 
+        self.pagina_label = Label(self.root, text=f"{self.pagina}/{len(self.paginas)}")
+        self.btn_pagina_rechts = Button(self.root, text=">", command=self.pagina_rechts)
+        self.btn_pagina_links = Button(self.root, text="<", command=self.pagina_links)
         self.db_berichten_frame = Frame(self.root)
-        self.db_berichten_pagina = 0
 
-        # layout is in rijen met elk 3 berichten (Frame met 3 Frames)
-        # max 5 rijen in 600 hoogte
-        self.db_bericht_group_frame = []
+        self.toon_pagina(self.pagina)
+
+        # layout
+        self.db_berichten_frame.pack()
+
+        self.btn_pagina_links.pack(side=LEFT)
+        self.pagina_label.pack(side=LEFT)
+        self.btn_pagina_rechts.pack(side=LEFT)
+
+    def on_wijzig(self):
+        pass
+
+    def pagina_rechts(self):
+        if self.pagina == len(self.paginas) - 1:
+            # grey out rechts knop
+            return
+
+        self.pagina += 1
+        self.toon_pagina(self.pagina)
+
+    def pagina_links(self):
+        if self.pagina == 0:
+            # grey out links knop
+            return
+
+        self.pagina -= 1
+        self.toon_pagina(self.pagina)
+
+    def toon_pagina(self, pagina_index):
+        """Toont de pagina met berichten
+
+        Args:
+            pagina_index: index van pagina vanaf 0
+        """
         cur_frame = None
 
-        for i, bericht in enumerate(paginas[0]):
+        # verwijder vorige
+        for frame in self.db_bericht_group_frame:
+            for child_frame in frame.winfo_children():
+                child_frame.pack_forget()
+                child_frame.destroy()
+            frame.pack_forget()
+            frame.destroy()
+
+        self.db_bericht_group_frame.clear()
+
+        for frame in self.db_berichten_frame.winfo_children():
+            frame.pack_forget()
+            frame.destroy()
+
+        for i, bericht in enumerate(self.paginas[pagina_index]):
             if i % 3 == 0:
                 cur_frame = Frame(self.db_berichten_frame)
                 self.db_bericht_group_frame.append(cur_frame)
@@ -152,15 +205,6 @@ class TotaalOverzichtGUI:
 
         for frame in self.db_bericht_group_frame:
             frame.pack(side=TOP)
-
-        # layout
-        self.db_berichten_frame.pack()
-
-    def on_wijzig(self):
-        pass
-
-    def show_pagina(self, pagina_index):
-        pass
 
     def show(self):
         if self.root == None:
