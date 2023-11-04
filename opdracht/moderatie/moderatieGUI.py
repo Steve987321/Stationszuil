@@ -14,7 +14,7 @@ class BerichtPreviewWidget(LabelFrame):
     is_inspecteren = False
 
     def __init__(self, root: Misc, group, bericht, naam, station, datum, tijd, goedgekeurd, email):
-        super().__init__(group, text="")
+        super().__init__(group, text="", width=150, height=100)
 
         self.root = root
         self.bericht = bericht
@@ -195,6 +195,8 @@ class TotaalOverzichtGUI:
                                                  tijd=bericht[4],
                                                  goedgekeurd=bericht[5],
                                                  email=bericht[6])
+
+            bericht_frame.pack_propagate(False)
             bericht_frame.pack(side=LEFT, padx=2, pady=5)
 
         for frame in self.db_bericht_group_frame:
