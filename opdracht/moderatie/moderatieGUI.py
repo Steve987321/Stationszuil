@@ -10,13 +10,18 @@ GRAY = "#999"
 
 
 class BerichtPreviewWidget(LabelFrame):
-    def __init__(self, root, bericht, naam, station, datum, goedgekeurd, email):
-        super().__init__(root, text="")
 
+    is_wijzigen = False
+
+    def __init__(self, root: Misc, group, bericht, naam, station, datum, tijd, goedgekeurd, email):
+        super().__init__(group, text="")
+
+        self.root = root
         self.bericht = bericht
         self.naam = naam
         self.station = station
         self.datum = datum
+        self.tijd = tijd
         self.goedgekeurd = goedgekeurd
         self.email = email
 
@@ -29,9 +34,49 @@ class BerichtPreviewWidget(LabelFrame):
         else:
             self.goedgekeurd_label = Label(self, text="Afgekeurd", fg=RED)
 
-        self.naam_label.pack(side=TOP)
+        self.btn_wijzig = Button(self, text="wijzig", command=self.on_wijzig)
+
+        self.naam_label.pack()
         self.bericht_label.pack()
         self.goedgekeurd_label.pack()
+        self.btn_wijzig.pack()
+
+        self.full_preview_frame = LabelFrame(root, text="wijzig bericht", width=300, height=300)
+        self.full_preview_frame.pack_propagate(False)
+
+        self.btn_sluit = Button(self.full_preview_frame, text="X", command=self.on_sluit_wijzigen)
+        self.naam_label_full = Label(self.full_preview_frame, text=f"naam: {naam}")
+        self.station_label_full = Label(self.full_preview_frame, text=f"station: {station}")
+        self.tijd_label_full = Label(self.full_preview_frame, text=f"datum: {datum}")
+        self.datum_label_full = Label(self.full_preview_frame, text=f"tijd: {tijd}")
+        self.bericht_full = Text(self.full_preview_frame)
+        self.bericht_full.insert(END, self.bericht)
+        self.bericht_full["state"] = DISABLED
+
+        self.btn_sluit.pack()
+        self.naam_label_full.pack()
+        self.station_label_full.pack()
+        self.tijd_label_full.pack()
+        self.datum_label_full.pack()
+        self.bericht_full.pack()
+
+    def on_wijzig(self):
+        if BerichtPreviewWidget.is_wijzigen:
+            return
+
+        for widget in self.root.winfo_children():
+            try:
+                widget["state"] = DISABLED
+            except:
+                pass
+
+        BerichtPreviewWidget.is_wijzigen = True
+
+        self.full_preview_frame.place(anchor=CENTER, relx=0.5, rely=0.5)
+
+    def on_sluit_wijzigen(self):
+        BerichtPreviewWidget.is_wijzigen = False
+        self.full_preview_frame.place_forget()
 
 
 class TotaalOverzichtGUI:
@@ -57,7 +102,7 @@ class TotaalOverzichtGUI:
                 return
 
         db_berichten = self.db.get_rows("""
-        select bericht.tekst, bericht.naam, bericht.station, bericht.datum, beoordeling.is_goedgekeurd, beoordeling.moderator_email from bericht
+        select bericht.tekst, bericht.naam, bericht.station, bericht.datum, bericht.tijd, beoordeling.is_goedgekeurd, beoordeling.moderator_email from bericht
         inner join beoordeling on bericht.beoordelingnr = beoordeling.beoordelingnr
         """)
 
@@ -73,24 +118,23 @@ class TotaalOverzichtGUI:
         self.db_bericht_group_frame = []
         cur_frame = None
         for i, bericht in enumerate(db_berichten):
-            if i % 4 == 0:
-                if cur_frame != None:
-                    cur_frame.pack(side=TOP)
-
+            if i % 3 == 0:
                 cur_frame = Frame(self.db_berichten_frame)
                 self.db_bericht_group_frame.append(cur_frame)
-                continue
 
-            bericht_frame = BerichtPreviewWidget(cur_frame,
-                                                 bericht[0],
-                                                 bericht[1],
-                                                 bericht[2],
-                                                 bericht[3],
-                                                 bericht[4],
-                                                 bericht[5])
-            bericht_frame.pack(side=LEFT)
+            bericht_frame = BerichtPreviewWidget(self.root,
+                                                 cur_frame,
+                                                 bericht=bericht[0],
+                                                 naam=bericht[1],
+                                                 station=bericht[2],
+                                                 datum=bericht[3],
+                                                 tijd=bericht[4],
+                                                 goedgekeurd=bericht[5],
+                                                 email=bericht[6])
+            bericht_frame.pack(side=LEFT, padx=2, pady=5)
 
-        self.btn_wijzig = Button(self.db_bericht_opties_frame, text="wijzig", command=self.on_wijzig)
+        for frame in self.db_bericht_group_frame:
+            frame.pack(side=TOP)
 
         # layout
         self.db_berichten_frame.pack()
