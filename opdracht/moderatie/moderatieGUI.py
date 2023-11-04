@@ -262,6 +262,8 @@ class ModeratieGUI:
 
         # login scherm 
         self.login_frame = LabelFrame(self.root, text="login", height=400, width=300)
+        self.login_email_label = Label(self.login_frame, text="email")
+        self.login_wachtwoord_label = Label(self.login_frame, text="wachtwoord")
         self.login_email = Entry(self.login_frame)
         self.login_wachtwoord = Entry(self.login_frame, show='*')
         self.btn_login = Button(self.login_frame, text="login", command=self.on_login)
@@ -278,8 +280,11 @@ class ModeratieGUI:
         self.login_frame.pack()
 
         # widgets
+        self.login_email_label.pack()
         self.login_email.pack()
+        self.login_wachtwoord_label.pack()
         self.login_wachtwoord.pack()
+        Label(self.login_frame, text="").pack()
         self.btn_login.pack()
         self.foutmelding_label.pack()
 
@@ -326,7 +331,7 @@ class ModeratieGUI:
         if self.overzicht_scherm != None:
             if self.overzicht_scherm.is_open():
                 return
-            
+
         self.overzicht_scherm = TotaalOverzichtGUI(self.moderatie.db)
 
     def update_bericht_labels(self):
