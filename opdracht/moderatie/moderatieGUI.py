@@ -151,6 +151,9 @@ class TotaalOverzichtGUI:
         self.pagina_label.pack(side=LEFT)
         self.btn_pagina_rechts.pack(side=LEFT)
 
+    def is_open(self):
+        return self.root.winfo_exists()
+
     def pagina_rechts(self):
         self.btn_pagina_links["state"] = NORMAL
         self.btn_pagina_rechts["state"] = NORMAL
@@ -216,16 +219,6 @@ class TotaalOverzichtGUI:
         for frame in self.db_bericht_group_frame:
             frame.pack(side=TOP)
 
-    def show(self):
-        if self.root == None:
-            return
-
-        self.root.mainloop()
-
-
-# temp
-# g = TotaalOverzichtGUI()
-# g.show()
 
 class ModeratieGUI:
     """Moderatie window en UI voor beoordelen van berichten"""
@@ -330,6 +323,10 @@ class ModeratieGUI:
         pass
 
     def on_toon_overzicht(self):
+        if self.overzicht_scherm != None:
+            if self.overzicht_scherm.is_open():
+                return
+            
         self.overzicht_scherm = TotaalOverzichtGUI(self.moderatie.db)
 
     def update_bericht_labels(self):
