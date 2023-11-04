@@ -9,30 +9,49 @@ WHITE = "#FFF"
 GRAY = "#999"
 
 
-class BerichtPreviewWidget(LabelFrame):
+def clamp(n, a, b):
+    """klem n tussen a en b"""
+    if n > b:
+        return b
+    elif n < a:
+        return a
+    else:
+        return n
 
+
+class BerichtPreviewWidget(LabelFrame):
+    """Bericht widget frame
+    Laat belangrijke info zien van het bericht, kan ook alles tonen door op inspecteer te drukken
+    """
     is_inspecteren = False
 
     def __init__(self, root: Misc, group, bericht, naam, station, datum, tijd, goedgekeurd, email):
         super().__init__(group, text="", width=150, height=100)
 
         self.root = root
-        self.bericht = bericht
-        self.naam = naam
-        self.station = station
-        self.datum = datum
-        self.tijd = tijd
-        self.goedgekeurd = goedgekeurd
-        self.email = email
 
-        # TODO: verklein te grote berichten
+        # preview
 
-        self.bericht_label = Label(self, text=bericht)
-        self.naam_label = Label(self, text=naam)
+        # verklein als nodig het bericht zodat het past in de widget
+        # verkort tot \n bij < 20
+        posnline = bericht.find('\n')
+        if posnline != -1 and posnline <= 20:
+            bericht_verkort = bericht[0:clamp(posnline, 0, 15)] + ".."
+            self.bericht_label = Label(self, text=bericht_verkort)
+        # geen \n maar bericht is langer dan 20
+        elif len(bericht) > 20:
+            bericht_verkort = bericht[0:15] + ".."
+            self.bericht_label = Label(self, text=bericht_verkort)
+        # bericht is al klein genoeg
+        else:
+            self.bericht_label = Label(self, text=bericht)
+
         if goedgekeurd:
             self.goedgekeurd_label = Label(self, text="Goedgekeurd", fg=GREEN)
         else:
             self.goedgekeurd_label = Label(self, text="Afgekeurd", fg=RED)
+
+        self.naam_label = Label(self, text=naam)
 
         self.btn_inspecteer = Button(self, text="inspecteer", command=self.on_inspecteer)
 
@@ -41,6 +60,7 @@ class BerichtPreviewWidget(LabelFrame):
         self.goedgekeurd_label.pack()
         self.btn_inspecteer.pack()
 
+        # inspecteer bericht frame
         self.full_preview_frame = LabelFrame(root, text="inspecteer bericht", width=300, height=300)
         self.full_preview_frame.pack_propagate(False)
 
@@ -49,8 +69,9 @@ class BerichtPreviewWidget(LabelFrame):
         self.station_label_full = Label(self.full_preview_frame, text=f"station: {station}")
         self.tijd_label_full = Label(self.full_preview_frame, text=f"datum: {datum}")
         self.datum_label_full = Label(self.full_preview_frame, text=f"tijd: {tijd}")
+        self.datum_label_full = Label(self.full_preview_frame, text=f"beoordeeld door: {email}")
         self.bericht_full = Text(self.full_preview_frame)
-        self.bericht_full.insert(END, self.bericht)
+        self.bericht_full.insert(END, bericht)
         self.bericht_full["state"] = DISABLED
 
         self.btn_sluit.pack()
@@ -61,6 +82,7 @@ class BerichtPreviewWidget(LabelFrame):
         self.bericht_full.pack()
 
     def on_inspecteer(self):
+        """Laat inspecteer frame zien, bovenop andere alle preview frames"""
         if BerichtPreviewWidget.is_inspecteren:
             return
 
@@ -75,6 +97,7 @@ class BerichtPreviewWidget(LabelFrame):
         self.full_preview_frame.place(anchor=CENTER, relx=0.5, rely=0.5)
 
     def on_sluit_inspecteer(self):
+        """Sluit het inspecteer frame"""
         BerichtPreviewWidget.is_inspecteren = False
         self.full_preview_frame.place_forget()
 
@@ -114,19 +137,19 @@ class TotaalOverzichtGUI:
         inner join beoordeling on bericht.beoordelingnr = beoordeling.beoordelingnr
         """)
 
-        pagina = 0
+        pagina_index = 0
 
         # groepeer de berichten in groepen van 15
         if len(db_berichten) > 15:
             for i in range(15, len(db_berichten), 15):
                 self.paginas.append(db_berichten[:i])
                 db_berichten = db_berichten[i:]
-                pagina += 1
+                pagina_index += 1
 
         if len(db_berichten) >= 0:
             self.paginas.append([])
             for bericht in db_berichten:
-                self.paginas[pagina].append(bericht)
+                self.paginas[pagina_index].append(bericht)
 
         self.root = Toplevel()
         self.root.title("Totaal Overzicht")
@@ -155,6 +178,7 @@ class TotaalOverzichtGUI:
         return self.root.winfo_exists()
 
     def pagina_rechts(self):
+        """Ga naar volgende pagina"""
         self.btn_pagina_links["state"] = NORMAL
         self.btn_pagina_rechts["state"] = NORMAL
 
@@ -166,6 +190,7 @@ class TotaalOverzichtGUI:
             self.btn_pagina_rechts["state"] = DISABLED
 
     def pagina_links(self):
+        """Ga naar vorige pagina"""
         self.btn_pagina_rechts["state"] = NORMAL
         self.btn_pagina_links["state"] = NORMAL
 
@@ -284,7 +309,7 @@ class ModeratieGUI:
         self.login_email.pack()
         self.login_wachtwoord_label.pack()
         self.login_wachtwoord.pack()
-        Label(self.login_frame, text="").pack()
+        Label(self.login_frame, text="").pack()  # spacing
         self.btn_login.pack()
         self.foutmelding_label.pack()
 
@@ -328,6 +353,7 @@ class ModeratieGUI:
         pass
 
     def on_toon_overzicht(self):
+        """Laat het overzicht scherm zien in een aparte window"""
         if self.overzicht_scherm != None:
             if self.overzicht_scherm.is_open():
                 return
