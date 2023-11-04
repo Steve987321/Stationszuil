@@ -129,35 +129,45 @@ class TotaalOverzichtGUI:
         self.root.resizable(False, False)
         self.root.geometry("500x600")
 
-        self.pagina_label = Label(self.root, text=f"{self.pagina}/{len(self.paginas)}")
-        self.btn_pagina_rechts = Button(self.root, text=">", command=self.pagina_rechts)
-        self.btn_pagina_links = Button(self.root, text="<", command=self.pagina_links)
+        navigatie_frame = Frame(self.root)
+
+        self.pagina_label = Label(navigatie_frame, text=f"{self.pagina + 1}/{len(self.paginas)}")
+        self.btn_pagina_rechts = Button(navigatie_frame, text=">", command=self.pagina_rechts)
+        self.btn_pagina_links = Button(navigatie_frame, text="<", command=self.pagina_links)
         self.db_berichten_frame = Frame(self.root)
 
-        self.toon_pagina(self.pagina)
+        self.toon_pagina(0)
 
         # layout
         self.db_berichten_frame.pack()
 
+        navigatie_frame.pack(side=BOTTOM)
         self.btn_pagina_links.pack(side=LEFT)
+        self.btn_pagina_links["state"] = DISABLED
         self.pagina_label.pack(side=LEFT)
         self.btn_pagina_rechts.pack(side=LEFT)
 
     def pagina_rechts(self):
-        if self.pagina == len(self.paginas) - 1:
-            # grey out rechts knop
-            return
+        self.btn_pagina_links["state"] = NORMAL
+        self.btn_pagina_rechts["state"] = NORMAL
 
         self.pagina += 1
         self.toon_pagina(self.pagina)
+        self.pagina_label["text"] = f"{self.pagina + 1}/{len(self.paginas)}"
+
+        if self.pagina == len(self.paginas) - 1:
+            self.btn_pagina_rechts["state"] = DISABLED
 
     def pagina_links(self):
-        if self.pagina == 0:
-            # grey out links knop
-            return
+        self.btn_pagina_rechts["state"] = NORMAL
+        self.btn_pagina_links["state"] = NORMAL
 
         self.pagina -= 1
         self.toon_pagina(self.pagina)
+        self.pagina_label["text"] = f"{self.pagina + 1}/{len(self.paginas)}"
+
+        if self.pagina == 0:
+            self.btn_pagina_links["state"] = DISABLED
 
     def toon_pagina(self, pagina_index):
         """Toont de pagina met berichten
