@@ -11,7 +11,7 @@ GRAY = "#999"
 
 class BerichtPreviewWidget(LabelFrame):
 
-    is_wijzigen = False
+    is_inspecteren = False
 
     def __init__(self, root: Misc, group, bericht, naam, station, datum, tijd, goedgekeurd, email):
         super().__init__(group, text="")
@@ -34,17 +34,17 @@ class BerichtPreviewWidget(LabelFrame):
         else:
             self.goedgekeurd_label = Label(self, text="Afgekeurd", fg=RED)
 
-        self.btn_wijzig = Button(self, text="wijzig", command=self.on_wijzig)
+        self.btn_inspecteer = Button(self, text="inspecteer", command=self.on_inspecteer)
 
         self.naam_label.pack()
         self.bericht_label.pack()
         self.goedgekeurd_label.pack()
-        self.btn_wijzig.pack()
+        self.btn_inspecteer.pack()
 
-        self.full_preview_frame = LabelFrame(root, text="wijzig bericht", width=300, height=300)
+        self.full_preview_frame = LabelFrame(root, text="inspecteer bericht", width=300, height=300)
         self.full_preview_frame.pack_propagate(False)
 
-        self.btn_sluit = Button(self.full_preview_frame, text="X", command=self.on_sluit_wijzigen)
+        self.btn_sluit = Button(self.full_preview_frame, text="X", command=self.on_sluit_inspecteer)
         self.naam_label_full = Label(self.full_preview_frame, text=f"naam: {naam}")
         self.station_label_full = Label(self.full_preview_frame, text=f"station: {station}")
         self.tijd_label_full = Label(self.full_preview_frame, text=f"datum: {datum}")
@@ -60,8 +60,8 @@ class BerichtPreviewWidget(LabelFrame):
         self.datum_label_full.pack()
         self.bericht_full.pack()
 
-    def on_wijzig(self):
-        if BerichtPreviewWidget.is_wijzigen:
+    def on_inspecteer(self):
+        if BerichtPreviewWidget.is_inspecteren:
             return
 
         for widget in self.root.winfo_children():
@@ -70,20 +70,17 @@ class BerichtPreviewWidget(LabelFrame):
             except:  # kan niet worden disabled, dit kan worden negeert
                 pass
 
-        BerichtPreviewWidget.is_wijzigen = True
+        BerichtPreviewWidget.is_inspecteren = True
 
         self.full_preview_frame.place(anchor=CENTER, relx=0.5, rely=0.5)
 
-    def on_sluit_wijzigen(self):
-        BerichtPreviewWidget.is_wijzigen = False
+    def on_sluit_inspecteer(self):
+        BerichtPreviewWidget.is_inspecteren = False
         self.full_preview_frame.place_forget()
 
 
 class TotaalOverzichtGUI:
-    """
-    Laat een totaal overzicht zien van alle beoordeelde berichten,
-    er kan als nodig wijzigingen worden gebracht aan de berichten
-    """
+    """Laat een totaal overzicht zien van alle beoordeelde berichten"""
     def __init__(self):
         self.paginas = []
 
@@ -145,9 +142,6 @@ class TotaalOverzichtGUI:
         self.btn_pagina_links.pack(side=LEFT)
         self.pagina_label.pack(side=LEFT)
         self.btn_pagina_rechts.pack(side=LEFT)
-
-    def on_wijzig(self):
-        pass
 
     def pagina_rechts(self):
         if self.pagina == len(self.paginas) - 1:
