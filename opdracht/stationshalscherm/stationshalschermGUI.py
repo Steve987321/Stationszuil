@@ -1,6 +1,6 @@
 from tkinter import *
 from stationinfo import *
-
+from datetime import datetime
 
 def scale_img_down(img: PhotoImage, factorx, factory):
     """Geeft een verkleinde PhotoImage terug met de gegeven factoren
@@ -99,6 +99,9 @@ class StationshalUI:
         self.station_label = Label(self.root, text=stationshalscherm_plek, font="Courier 20 normal")
         self.faciliteiten_frame = Frame(self.root)
 
+        # klok
+        self.klok_label = Label(self.root, text=datetime.now().strftime("%H:%M:%S"), font="Courier 20 normal")
+
         # image faciliteiten
         self.img_bike = PhotoImage(file="img_faciliteiten/img_ovfiets.png")
         self.img_lift = PhotoImage(file="img_faciliteiten/img_lift.png")
@@ -121,23 +124,26 @@ class StationshalUI:
         self.temperatuur = StringVar()
         self.weer_beschrijving = StringVar()
         self.regenmm = StringVar()
+        self.windms = StringVar()
 
         # root layout
         self.station_label.pack(side=TOP)
-        self.faciliteiten_frame.pack(anchor=CENTER, side=TOP)
+        self.klok_label.pack(side=TOP)
+        self.faciliteiten_frame.pack(anchor=CENTER, side=TOP, pady=10)
         self.weer_info_frame.pack(side=LEFT, fill=BOTH, expand=True, padx=20, pady=20)
         self.station_frame.pack(side=RIGHT, fill=BOTH, expand=True, padx=20, pady=20)
 
         # weer info frame
         self.temp_label = Label(self.weer_info_frame, textvariable=self.temperatuur, font="Courier 30 normal")
-        self.bewolktheid_label = Label(self.weer_info_frame, textvariable=self.weer_beschrijving,
-                                       font="Courier 20 normal")
+        self.bewolktheid_label = Label(self.weer_info_frame, textvariable=self.weer_beschrijving, font="Courier 20 normal")
         self.regen_label = Label(self.weer_info_frame, textvariable=self.regenmm, font="Courier 20 normal")
+        self.wind_label = Label(self.weer_info_frame, textvariable=self.windms, font="Courier 20 normal")
 
-        # layout 
-        self.bewolktheid_label.pack()
+        # layout
         self.temp_label.pack()
+        self.bewolktheid_label.pack()
         self.regen_label.pack()
+        self.wind_label.pack()
 
         # station frame
         self.bericht_labels = (
@@ -155,20 +161,29 @@ class StationshalUI:
         self.update_weer_labels()
         self.update_bericht_labels()
         self.update_faciliteiten()
+        self.update_klok()
+
+    def update_klok(self):
+        self.klok_label["text"] = datetime.now().strftime("%H:%M:%S")
+        self.klok_label.after(1000, self.update_klok)
 
     def update_weer_labels(self):
         """Update weer info van de station"""
         weer = get_station_weer_info()
         try:
-            # TODO: andere info toevoegen
             self.temperatuur.set(f"{round(weer['main']['temp'])}°C")
             self.weer_beschrijving.set(weer["weather"][0]["description"])
             if "rain" in weer.keys():
-                self.regenmm = weer["rain"]["1h"]
+                self.regenmm.set(f"{round(weer['rain']['1h'], 1)}mm")
+            if "wind" in weer.keys():
+                self.windms.set(f"wind {round(weer['wind']['speed'], 1)}m/s")
 
         except KeyError as e:
             print(f"Error bij lezen van weer info: {e}")
             return
+
+        # update elke minuut
+        self.weer_info_frame.after(60000, self.update_weer_labels)
 
     def update_bericht_labels(self):
         """Update de labels met de nieuwste 5 berichten van de station"""
