@@ -67,7 +67,7 @@ class BerichtPreviewWidget(LabelFrame):
         for widget in self.root.winfo_children():
             try:
                 widget["state"] = DISABLED
-            except:
+            except:  # kan niet worden disabled, dit kan worden negeert
                 pass
 
         BerichtPreviewWidget.is_wijzigen = True
@@ -106,18 +106,35 @@ class TotaalOverzichtGUI:
         inner join beoordeling on bericht.beoordelingnr = beoordeling.beoordelingnr
         """)
 
+        paginas = []
+        pagina = 0
+
+        # groepeer de berichten in groepen van 15 TODO: range() loop met stappen van 15 
+        for i, bericht in enumerate(db_berichten):
+            if i != 0 and i % 15 == 0:
+                paginas.append(db_berichten[:i])
+                db_berichten = db_berichten[i:]
+                pagina += 1
+
+        if len(db_berichten) >= 0:
+            paginas.append([])
+            for bericht in db_berichten:
+                paginas[pagina].append(bericht)
+
         self.root = Tk()
         self.root.title("Totaal Overzicht")
         self.root.resizable(False, False)
         self.root.geometry("500x600")
 
         self.db_berichten_frame = Frame(self.root)
-        self.db_bericht_opties_frame = LabelFrame(self.root, text="bericht opties")
+        self.db_berichten_pagina = 0
 
         # layout is in rijen met elk 3 berichten (Frame met 3 Frames)
+        # max 5 rijen in 600 hoogte
         self.db_bericht_group_frame = []
         cur_frame = None
-        for i, bericht in enumerate(db_berichten):
+
+        for i, bericht in enumerate(paginas[0]):
             if i % 3 == 0:
                 cur_frame = Frame(self.db_berichten_frame)
                 self.db_bericht_group_frame.append(cur_frame)
@@ -138,9 +155,11 @@ class TotaalOverzichtGUI:
 
         # layout
         self.db_berichten_frame.pack()
-        self.db_bericht_opties_frame.pack()
 
     def on_wijzig(self):
+        pass
+
+    def show_pagina(self, pagina_index):
         pass
 
     def show(self):
@@ -150,6 +169,7 @@ class TotaalOverzichtGUI:
         self.root.mainloop()
 
 
+# temp
 g = TotaalOverzichtGUI()
 g.show()
 
