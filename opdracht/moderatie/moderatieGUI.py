@@ -109,9 +109,9 @@ class TotaalOverzichtGUI:
         paginas = []
         pagina = 0
 
-        # groepeer de berichten in groepen van 15 TODO: range() loop met stappen van 15 
-        for i, bericht in enumerate(db_berichten):
-            if i != 0 and i % 15 == 0:
+        # groepeer de berichten in groepen van 15
+        if len(db_berichten) > 15:
+            for i in range(15, len(db_berichten), 15):
                 paginas.append(db_berichten[:i])
                 db_berichten = db_berichten[i:]
                 pagina += 1
