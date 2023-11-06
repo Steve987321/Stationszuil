@@ -88,6 +88,8 @@ class StationshalUI:
     """Stationshalscherm UI en window"""
 
     def __init__(self):
+        self.img_weer_icon = None
+
         # root 
         self.root = Tk()
         self.root.title("Stationshalscherm")
@@ -133,6 +135,7 @@ class StationshalUI:
         self.bericht_frame.pack(side=RIGHT, fill=BOTH, padx=30, pady=20)
 
         # weer info frame
+        self.weer_icon = Label(self.root)
         self.station_label = Label(self.root, text=stationshalscherm_plek, font="Arial 25 normal")
         self.temp_label = Label(self.root, textvariable=self.temperatuur, font="Arial 35 normal")
         self.weer_label = Label(self.root, text="", font="Arial 20 normal")
@@ -148,6 +151,7 @@ class StationshalUI:
         self.station_label.place(relx=0.05, rely=0.5)
         self.temp_label.place(relx=0.05, rely=0.57)
         self.weer_label.place(relx=0.35, rely=0.55)
+        self.weer_icon.place(relx=0.25, rely=0.6)
 
         # station frame
         self.bericht_labels = (
@@ -188,6 +192,15 @@ class StationshalUI:
 
             self.weer_label["text"] = (f"{weer['weather'][0]['description']} {rain1h}\n"
                                        f"{windms}")
+
+            # update icoon
+            r = requests.get(f"https://openweathermap.org/img/wn/{weer['weather'][0]['icon']}@2x.png")
+            if not r.ok:
+                print(f"Er is iets fout gegaan met het ophalen van het weer icoon: {r.status_code}")
+                return
+
+            self.img_weer_icon = PhotoImage(data=r.content)
+            self.weer_icon["image"] = self.img_weer_icon
 
         except KeyError as e:
             print(f"Error bij lezen van weer info: {e}")
