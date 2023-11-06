@@ -79,7 +79,8 @@ class StationBerichtWidget:
 
             bericht = StationBericht(dictstr)
 
-        self.info["text"] = f"{bericht.naam} op {bericht.datum} om {bericht.tijd}"
+        #
+        self.info["text"] = f"{bericht.naam} op {bericht.station}"
         self.bericht["text"] = f"“{bericht.text}”"
 
 
@@ -96,11 +97,11 @@ class StationshalUI:
         # root frames
         self.weer_info_frame = Frame(self.root)
         self.station_frame = Frame(self.root)
-        self.station_label = Label(self.root, text=stationshalscherm_plek, font="Courier 20 normal")
+        self.station_label = Label(self.root, text=stationshalscherm_plek, font="Courier 25 normal")
         self.faciliteiten_frame = Frame(self.root)
 
         # klok
-        self.klok_label = Label(self.root, text=datetime.now().strftime("%H:%M:%S"), font="Courier 20 normal")
+        self.klok_label = Label(self.root, text=datetime.now().strftime("%H:%M:%S"), font="Courier 25 normal")
 
         # image faciliteiten
         self.img_bike = PhotoImage(file="img_faciliteiten/img_ovfiets.png")
@@ -109,10 +110,10 @@ class StationshalUI:
         self.img_pr = PhotoImage(file="img_faciliteiten/img_pr.png")
 
         # verklein 
-        self.img_bike = scale_img_down(self.img_bike, 0.5, 0.5)
-        self.img_lift = scale_img_down(self.img_lift, 0.5, 0.5)
-        self.img_toilet = scale_img_down(self.img_toilet, 0.5, 0.5)
-        self.img_pr = scale_img_down(self.img_pr, 0.5, 0.5)
+        self.img_bike = scale_img_down(self.img_bike, 0.7, 0.7)
+        self.img_lift = scale_img_down(self.img_lift, 0.7, 0.7)
+        self.img_toilet = scale_img_down(self.img_toilet, 0.7, 0.7)
+        self.img_pr = scale_img_down(self.img_pr, 0.7, 0.7)
 
         # sla de images op in widgets via Labels
         self.bike_widget = Label(self.faciliteiten_frame, image=self.img_bike)
@@ -135,15 +136,11 @@ class StationshalUI:
 
         # weer info frame
         self.temp_label = Label(self.weer_info_frame, textvariable=self.temperatuur, font="Courier 30 normal")
-        self.bewolktheid_label = Label(self.weer_info_frame, textvariable=self.weer_beschrijving, font="Courier 20 normal")
-        self.regen_label = Label(self.weer_info_frame, textvariable=self.regenmm, font="Courier 20 normal")
-        self.wind_label = Label(self.weer_info_frame, textvariable=self.windms, font="Courier 20 normal")
+        self.weer_label = Label(self.weer_info_frame, text="", font="Courier 20 normal")
 
         # layout
-        self.temp_label.pack()
-        self.bewolktheid_label.pack()
-        self.regen_label.pack()
-        self.wind_label.pack()
+        self.temp_label.pack(pady=10)
+        self.weer_label.pack(pady=10)
 
         # station frame
         self.bericht_labels = (
@@ -173,10 +170,18 @@ class StationshalUI:
         try:
             self.temperatuur.set(f"{round(weer['main']['temp'])}°C")
             self.weer_beschrijving.set(weer["weather"][0]["description"])
+
+            rain1h = ""
+            windms = ""
+
             if "rain" in weer.keys():
-                self.regenmm.set(f"{round(weer['rain']['1h'], 1)}mm")
+                rain1h = f"{round(weer['rain']['1h'], 1)}mm \n"
             if "wind" in weer.keys():
-                self.windms.set(f"wind {round(weer['wind']['speed'], 1)}m/s")
+                windms = f"wind {round(weer['wind']['speed'], 1)}m/s \n"
+
+            self.weer_label["text"] = (f"{weer['weather'][0]['description']} \n"
+                                       f"{rain1h}"
+                                       f"{windms}")
 
         except KeyError as e:
             print(f"Error bij lezen van weer info: {e}")
