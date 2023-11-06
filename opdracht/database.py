@@ -28,8 +28,8 @@ class StationsZuilDB:
                         database="StationZuil", 
                         user="postgres",
                         password="pass",
-                        host="localhost",
-                        port="5433",
+                        host="51.132.140.12",
+                        port="5432",
                         connect_timeout=5 
                         )
             
@@ -49,17 +49,17 @@ class StationsZuilDB:
         print("connectie sluiten")
         self.con.close()
 
-    def get_rows(self, query, args = None):
+    def get_rows(self, query, args=None):
         """Geeft de rijen van de gegeven query"""
         self.cursor.execute(query, args)
         return self.cursor.fetchall()
     
-    def update_rows(self, query, args = None):
+    def update_rows(self, query, args=None):
         """Update rijen met de gegeven query"""
         self.cursor.execute(query, args)
         self.con.commit()
     
-    def get_row(self, query, args = None):
+    def get_row(self, query, args=None):
         """Geeft een rij van de gegeven query"""
         self.cursor.execute(query, args)
         return self.cursor.fetchone()
