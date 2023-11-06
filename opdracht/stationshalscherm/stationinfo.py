@@ -52,13 +52,17 @@ def get_station_weer_info():
     return dict(r.json())
 
 
-def get_station_faciliteiten():
-    """Geeft beschikbare faciliteiten van de station via een dictionary"""
+def get_station_faciliteiten(station: str):
+    """Geeft beschikbare faciliteiten van de station via een dictionary
+
+    Returns:
+        Dict met keys fiets, lift, toilet, pr
+    """
     rows = db.get_row("""
                 select ov_bike, elevator, toilet, park_and_ride from station_service
                 where station_city = %s    
                 """,
-                      (stationshalscherm_plek,))  # tuple
+                      (station,))  # tuple
 
     return {"fiets": rows[0], "lift": rows[1], "toilet": rows[2], "pr": rows[3]}
 

@@ -2,6 +2,7 @@ from tkinter import *
 from stationinfo import *
 from datetime import datetime
 
+
 def verklein_image(img: PhotoImage, factorx, factory):
     """Geeft een verkleinde PhotoImage terug met de gegeven factoren
     
@@ -52,13 +53,9 @@ class StationBerichtWidget:
 
     def __init__(self, root: Misc):
         self.root = root
-        self.bericht = Label(root)
-        self.info = Label(root)
-        self.bericht.pack()
-        self.info.pack()
-
-        # spacing 
-        Label(self.root, text="").pack()
+        self.berichten_frame = Frame(root)
+        self.bericht = Label(self.berichten_frame)
+        self.berichten_frame.pack(pady=10)
 
     def update(self, bericht: StationBericht = None, dictstr=None, maak_leeg=False):
         """Update bericht inhoud
@@ -69,7 +66,6 @@ class StationBerichtWidget:
             maak_leeg: Leeg de widget inhoud
         """
         if maak_leeg:
-            self.info["text"] = ""
             self.bericht["text"] = ""
             return
 
@@ -79,9 +75,13 @@ class StationBerichtWidget:
 
             bericht = StationBericht(dictstr)
 
-        #
-        self.info["text"] = f"{bericht.naam} op {bericht.station}"
-        self.bericht["text"] = f"“{bericht.text}”"
+        self.bericht["text"] = (f"{bericht.naam} op {bericht.station}"
+                                f"“{bericht.text}”")
+
+        self.bericht.pack(side=LEFT)
+
+        # spacing
+        Label(self.root, text="").pack()
 
 
 class StationshalUI:
@@ -131,8 +131,8 @@ class StationshalUI:
         self.station_label.pack(side=TOP)
         self.klok_label.pack(side=TOP)
         self.faciliteiten_frame.pack(anchor=CENTER, side=TOP, pady=10)
-        self.weer_info_frame.pack(side=LEFT, fill=BOTH, expand=True, padx=20, pady=20)
-        self.station_frame.pack(side=RIGHT, fill=BOTH, expand=True, padx=20, pady=20)
+        self.weer_info_frame.pack(side=LEFT, fill=BOTH, expand=True, padx=10, pady=20)
+        self.station_frame.pack(side=RIGHT, fill=BOTH, expand=True, padx=10, pady=20)
 
         # weer info frame
         self.temp_label = Label(self.weer_info_frame, textvariable=self.temperatuur, font="Courier 30 normal")
@@ -175,20 +175,19 @@ class StationshalUI:
             windms = ""
 
             if "rain" in weer.keys():
-                rain1h = f"{round(weer['rain']['1h'], 1)}mm \n"
+                rain1h = f"{round(weer['rain']['1h'], 1)}mm "
             if "wind" in weer.keys():
                 windms = f"wind {round(weer['wind']['speed'], 1)}m/s \n"
 
-            self.weer_label["text"] = (f"{weer['weather'][0]['description']} \n"
-                                       f"{rain1h}"
+            self.weer_label["text"] = (f"{weer['weather'][0]['description']} {rain1h}\n"
                                        f"{windms}")
 
         except KeyError as e:
             print(f"Error bij lezen van weer info: {e}")
             return
 
-        # update elke minuut
-        self.weer_info_frame.after(60000, self.update_weer_labels)
+        # update weer info elke 1 uur
+        self.weer_label.after(60000, self.update_weer_labels)
 
     def update_bericht_labels(self):
         """Update de labels met de nieuwste 5 berichten van de station"""
@@ -212,14 +211,15 @@ class StationshalUI:
             row = rows[i]
             bericht = StationBericht(bericht=row[0], naam=row[1], datum=row[2], tijd=row[3].strftime("%H:%M"),
                                      station=row[4])
+
             self.bericht_labels[i].update(bericht)
 
     def update_faciliteiten(self):
         """Laat de beschikbare faciliteiten op het station zien, roep deze functie maar 1 keer in het begin op"""
-        faciliteiten = get_station_faciliteiten()
+        faciliteiten = get_station_faciliteiten(stationshalscherm_plek)
 
         if faciliteiten["fiets"]:
-            self.bike_widget.pack(side=TOP)
+            self.bike_widget.pack(side=LEFT)
         if faciliteiten["lift"]:
             self.lift_widget.pack(side=LEFT)
         if faciliteiten["toilet"]:
