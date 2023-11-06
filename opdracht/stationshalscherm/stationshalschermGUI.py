@@ -54,7 +54,8 @@ class StationBerichtWidget:
     def __init__(self, root: Misc):
         self.root = root
         self.berichten_frame = Frame(root)
-        self.bericht = Label(self.berichten_frame)
+        self.naam = Label(self.berichten_frame)
+        self.bericht = Label(self.berichten_frame, font="Arial 15 italic")
         self.berichten_frame.pack(pady=10)
 
     def update(self, bericht: StationBericht = None, dictstr=None, maak_leeg=False):
@@ -75,10 +76,11 @@ class StationBerichtWidget:
 
             bericht = StationBericht(dictstr)
 
-        self.bericht["text"] = (f"{bericht.naam} op {bericht.station}"
-                                f"“{bericht.text}”")
+        self.naam["text"] = f"{bericht.naam} op {bericht.station}"
+        self.bericht["text"] = f"“{bericht.text}”"
 
-        self.bericht.pack(side=LEFT)
+        self.naam.pack()
+        self.bericht.pack()
 
         # spacing
         Label(self.root, text="").pack()
@@ -130,28 +132,29 @@ class StationshalUI:
 
         # root layout
         self.klok_label.pack(side=TOP)
-        self.faciliteiten_frame.pack(anchor=CENTER, side=TOP, pady=10)
-        self.weer_info_frame.pack(side=LEFT, fill=BOTH, expand=True, pady=20)
-        self.bericht_frame.pack(side=RIGHT, fill=BOTH, padx=30, pady=20)
+        self.faciliteiten_frame.pack(anchor=CENTER, side=TOP, pady=25)
+        self.weer_info_frame.pack(side=LEFT, fill=BOTH, padx=80, pady=20)
+        self.bericht_frame.pack(side=RIGHT, fill=BOTH, padx=80, pady=20)
 
         # weer info frame
-        self.weer_icon = Label(self.root)
-        self.station_label = Label(self.root, text=stationshalscherm_plek, font="Arial 25 normal")
-        self.temp_label = Label(self.root, textvariable=self.temperatuur, font="Arial 35 normal")
-        self.weer_label = Label(self.root, text="", font="Arial 20 normal")
+        self.weer_icon = Label(self.weer_info_frame)
+        self.station_label = Label(self.weer_info_frame, text=stationshalscherm_plek, font="Arial 25 normal")
+        self.temp_label = Label(self.weer_info_frame, textvariable=self.temperatuur, font="Arial 35 normal")
+        self.weer_label = Label(self.weer_info_frame, text="", font="Arial 20 normal")
 
         # layout
-        # self.station_label.pack(anchor=W, padx=20)
-        # self.temp_label.pack(anchor=W, padx=20)
-        # self.weer_label.pack(anchor=E, padx=20, pady=10)
+        self.weer_icon.pack()
+        self.station_label.pack()
+        self.temp_label.pack()
+        self.weer_label.pack()
         # self.station_label.grid(column=0, row=0, padx=75)
         # self.temp_label.grid(column=0, row=1)
         # self.weer_label.grid(row=0, column=1)
 
-        self.station_label.place(relx=0.05, rely=0.5)
-        self.temp_label.place(relx=0.05, rely=0.57)
-        self.weer_label.place(relx=0.35, rely=0.55)
-        self.weer_icon.place(relx=0.25, rely=0.6)
+        # self.station_label.place(relx=0.05, rely=0.5)
+        # self.temp_label.place(relx=0.05, rely=0.57)
+        # self.weer_label.place(relx=0.35, rely=0.55)
+        # self.weer_icon.place(relx=0.25, rely=0.4)
 
         # station frame
         self.bericht_labels = (
