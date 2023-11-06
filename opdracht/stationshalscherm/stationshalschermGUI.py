@@ -96,8 +96,7 @@ class StationshalUI:
 
         # root frames
         self.weer_info_frame = Frame(self.root)
-        self.station_frame = Frame(self.root)
-        self.station_label = Label(self.root, text=stationshalscherm_plek, font="Courier 25 normal")
+        self.bericht_frame = Frame(self.root)
         self.faciliteiten_frame = Frame(self.root)
 
         # klok
@@ -128,27 +127,35 @@ class StationshalUI:
         self.windms = StringVar()
 
         # root layout
-        self.station_label.pack(side=TOP)
         self.klok_label.pack(side=TOP)
         self.faciliteiten_frame.pack(anchor=CENTER, side=TOP, pady=10)
-        self.weer_info_frame.pack(side=LEFT, fill=BOTH, expand=True, padx=10, pady=20)
-        self.station_frame.pack(side=RIGHT, fill=BOTH, expand=True, padx=10, pady=20)
+        self.weer_info_frame.pack(side=LEFT, fill=BOTH, expand=True, pady=20)
+        self.bericht_frame.pack(side=RIGHT, fill=BOTH, padx=30, pady=20)
 
         # weer info frame
-        self.temp_label = Label(self.weer_info_frame, textvariable=self.temperatuur, font="Courier 30 normal")
-        self.weer_label = Label(self.weer_info_frame, text="", font="Courier 20 normal")
+        self.station_label = Label(self.root, text=stationshalscherm_plek, font="Arial 25 normal")
+        self.temp_label = Label(self.root, textvariable=self.temperatuur, font="Arial 35 normal")
+        self.weer_label = Label(self.root, text="", font="Arial 20 normal")
 
         # layout
-        self.temp_label.pack(pady=10)
-        self.weer_label.pack(pady=10)
+        # self.station_label.pack(anchor=W, padx=20)
+        # self.temp_label.pack(anchor=W, padx=20)
+        # self.weer_label.pack(anchor=E, padx=20, pady=10)
+        # self.station_label.grid(column=0, row=0, padx=75)
+        # self.temp_label.grid(column=0, row=1)
+        # self.weer_label.grid(row=0, column=1)
+
+        self.station_label.place(relx=0.05, rely=0.5)
+        self.temp_label.place(relx=0.05, rely=0.57)
+        self.weer_label.place(relx=0.35, rely=0.55)
 
         # station frame
         self.bericht_labels = (
-            StationBerichtWidget(self.station_frame),
-            StationBerichtWidget(self.station_frame),
-            StationBerichtWidget(self.station_frame),
-            StationBerichtWidget(self.station_frame),
-            StationBerichtWidget(self.station_frame),
+            StationBerichtWidget(self.bericht_frame),
+            StationBerichtWidget(self.bericht_frame),
+            StationBerichtWidget(self.bericht_frame),
+            StationBerichtWidget(self.bericht_frame),
+            StationBerichtWidget(self.bericht_frame),
         )
 
         # database connectie
