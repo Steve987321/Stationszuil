@@ -35,7 +35,7 @@ class BerichtPreviewWidget(LabelFrame):
 
         # verklein als nodig het bericht zodat het past in de widget
         posnline = bericht.find('\n')
-        
+
         if posnline != -1 and posnline <= 20:
             # verkort tot \n bij < 20
             bericht_verkort = bericht[0:clamp(posnline, 0, 15)] + ".."
@@ -104,7 +104,7 @@ class BerichtPreviewWidget(LabelFrame):
         self.full_preview_frame.place_forget()
 
 
-class TotaalOverzichtGUI:
+class TotaalOverzichtScherm:
     """Laat een totaal overzicht zien van alle beoordeelde berichten"""
     def __init__(self, db: database.StationsZuilDB = None):
         self.paginas = []

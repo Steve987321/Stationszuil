@@ -1,7 +1,7 @@
 from modereer import *
 from tkinter import *
 from tkinter import messagebox
-from totaaloverzichtscherm import TotaalOverzichtGUI
+from totaaloverzichtscherm import TotaalOverzichtScherm
 
 
 GREEN = "#0F0"
@@ -124,7 +124,7 @@ class ModeratieGUI:
             if self.overzicht_scherm.is_open():
                 return
 
-        self.overzicht_scherm = TotaalOverzichtGUI(self.moderatie.db)
+        self.overzicht_scherm = TotaalOverzichtScherm(self.moderatie.db)
 
     def update_bericht_labels(self):
         """Update csv bestand knop press"""
