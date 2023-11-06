@@ -2,7 +2,7 @@ from tkinter import *
 from stationinfo import *
 from datetime import datetime
 
-def scale_img_down(img: PhotoImage, factorx, factory):
+def verklein_image(img: PhotoImage, factorx, factory):
     """Geeft een verkleinde PhotoImage terug met de gegeven factoren
     
     Args:
@@ -110,10 +110,10 @@ class StationshalUI:
         self.img_pr = PhotoImage(file="img_faciliteiten/img_pr.png")
 
         # verklein 
-        self.img_bike = scale_img_down(self.img_bike, 0.7, 0.7)
-        self.img_lift = scale_img_down(self.img_lift, 0.7, 0.7)
-        self.img_toilet = scale_img_down(self.img_toilet, 0.7, 0.7)
-        self.img_pr = scale_img_down(self.img_pr, 0.7, 0.7)
+        self.img_bike = verklein_image(self.img_bike, 0.7, 0.7)
+        self.img_lift = verklein_image(self.img_lift, 0.7, 0.7)
+        self.img_toilet = verklein_image(self.img_toilet, 0.7, 0.7)
+        self.img_pr = verklein_image(self.img_pr, 0.7, 0.7)
 
         # sla de images op in widgets via Labels
         self.bike_widget = Label(self.faciliteiten_frame, image=self.img_bike)
