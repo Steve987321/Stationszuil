@@ -31,6 +31,7 @@ def get_station_coords(station):
 
     if not r.ok:
         print(f"Er is iets fout gegaan met het ophalen van het weer info: {r.status_code}")
+        return -1, -1
 
     info = r.json()[0]
 
