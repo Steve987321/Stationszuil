@@ -27,8 +27,8 @@ class StationsZuilDB:
                         database="StationZuil", 
                         user="postgres",
                         password="pass",
-                        host="localhost",
-                        port="5433",
+                        host="51.132.140.12",
+                        port="5432",
                         connect_timeout=5 
                         )
             
