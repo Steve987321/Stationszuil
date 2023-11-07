@@ -1,6 +1,6 @@
 import csv
 from datetime import datetime
-from opdracht import database
+from stationszuil import database
 
 
 class Modereer:

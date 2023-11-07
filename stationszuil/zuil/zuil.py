@@ -16,7 +16,7 @@ def get_random_station():
     """
     with open("../../stations.txt", 'r') as f:
         return random.choice(f.readlines()).strip()
-    
+
 
 def sla_bericht_op(bericht: dict):
     """"Slaat het bericht op in het bestand via append."""

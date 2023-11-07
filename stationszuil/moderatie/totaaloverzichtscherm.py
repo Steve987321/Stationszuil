@@ -1,6 +1,6 @@
 from tkinter import *
 from tkinter import messagebox
-from opdracht import database
+from stationszuil import database
 
 
 GREEN = "#0F0"
