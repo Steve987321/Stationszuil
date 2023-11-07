@@ -2,7 +2,7 @@ from tkinter import *
 from tkinter import messagebox
 from stationszuil import database
 
-
+# voor Tkinter widgets
 GREEN = "#0F0"
 RED = "#F00"
 BLUE = "#00F"
@@ -11,7 +11,11 @@ GRAY = "#999"
 
 
 def clamp(n, a, b):
-    """klem n tussen a en b"""
+    """klem n tussen a en b
+
+    Returns:
+        n dat is beperkt tussen a en b
+    """
     if n > b:
         return b
     elif n < a:
@@ -22,8 +26,11 @@ def clamp(n, a, b):
 
 class BerichtPreviewWidget(LabelFrame):
     """Bericht widget frame
+
     Laat belangrijke info zien van het bericht, kan ook alles tonen door op inspecteer te drukken
     """
+
+    # geeft aan of er een bericht wordt geïnspecteerd
     is_inspecteren = False
 
     def __init__(self, root: Misc, group, bericht, naam, station, datum, tijd, goedgekeurd, email):
@@ -31,9 +38,7 @@ class BerichtPreviewWidget(LabelFrame):
 
         self.root = root
 
-        # preview
-
-        # verklein als nodig het bericht zodat het past in de widget
+        # verkort het bericht als nodig is zodat het past in de widget (max. 1 lijn van 20 letters)
         posnline = bericht.find('\n')
 
         if posnline != -1 and posnline <= 20:
@@ -48,13 +53,13 @@ class BerichtPreviewWidget(LabelFrame):
             # bericht is al klein genoeg
             self.bericht_label = Label(self, text=bericht)
 
+        # gekleurde beoordeling status tekst
         if goedgekeurd:
             self.goedgekeurd_label = Label(self, text="Goedgekeurd", fg=GREEN)
         else:
             self.goedgekeurd_label = Label(self, text="Afgekeurd", fg=RED)
 
         self.naam_label = Label(self, text=naam)
-
         self.btn_inspecteer = Button(self, text="inspecteer", command=self.on_inspecteer)
 
         self.naam_label.pack()
@@ -84,7 +89,7 @@ class BerichtPreviewWidget(LabelFrame):
         self.bericht_full.pack()
 
     def on_inspecteer(self):
-        """Laat inspecteer frame zien, bovenop andere alle preview frames"""
+        """Laat de inspecteer frame zien, bovenop andere alle preview frames"""
         if BerichtPreviewWidget.is_inspecteren:
             return
 
@@ -99,7 +104,7 @@ class BerichtPreviewWidget(LabelFrame):
         self.full_preview_frame.place(anchor=CENTER, relx=0.5, rely=0.5)
 
     def on_sluit_inspecteer(self):
-        """Sluit het inspecteer frame"""
+        """Sluit inspecteer frame"""
         BerichtPreviewWidget.is_inspecteren = False
         self.full_preview_frame.place_forget()
 
@@ -107,6 +112,7 @@ class BerichtPreviewWidget(LabelFrame):
 class TotaalOverzichtScherm:
     """Laat een totaal overzicht zien van alle beoordeelde berichten"""
     def __init__(self, db: database.StationsZuilDB = None):
+        # houd de pagina's en daarvan de pagina inhoud
         self.paginas = []
 
         # layout is in rijen met elk 3 berichten (Frame met 3 Frames)
@@ -123,9 +129,11 @@ class TotaalOverzichtScherm:
             connectie_resultaat = self.db.connect()
 
             while connectie_resultaat == False:
+                # geef een messagebox scherm als er iets fout gaat met het verbinden
+
                 try_again = messagebox.askretrycancel(
                     "Database",
-                    f"Er kon geen connectie worden gemaakt met de database: {self.db.error_str}")
+                    f"Er kon geen verbinding worden gemaakt met de database: {self.db.error_str}")
                 if try_again:
                     connectie_resultaat = self.db.connect()
                 else:
@@ -139,19 +147,18 @@ class TotaalOverzichtScherm:
         inner join beoordeling on bericht.beoordelingnr = beoordeling.beoordelingnr
         """)
 
-        pagina_index = 0
-
         # groepeer de berichten in groepen van 15
         if len(db_berichten) > 15:
             for i in range(15, len(db_berichten), 15):
                 self.paginas.append(db_berichten[:i])
                 db_berichten = db_berichten[i:]
-                pagina_index += 1
 
+        # als het niet precies uit komt vul een laatste pagina met de overige berichten
         if len(db_berichten) >= 0:
             self.paginas.append([])
+            laatste_index = len(self.paginas) - 1
             for bericht in db_berichten:
-                self.paginas[pagina_index].append(bericht)
+                self.paginas[laatste_index].append(bericht)
 
         self.root = Toplevel()
         self.root.title("Totaal Overzicht")
@@ -208,8 +215,15 @@ class TotaalOverzichtScherm:
         """Toont de pagina met berichten
 
         Args:
-            pagina_index: index van pagina vanaf 0
+            pagina_index: index van pagina vanaf 0, wordt geklemt
         """
+        if len(self.paginas) == 0:
+            messagebox.showinfo("Totaal Overzicht",
+                                "Er zijn geen beoordelingen om te tonen")
+            return
+
+        pagina_index = clamp(pagina_index, 0, len(self.paginas) - 1)
+
         cur_frame = None
 
         # verwijder vorige

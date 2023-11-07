@@ -2,7 +2,7 @@ import requests
 from stationszuil import database
 
 stationshalscherm_plek = "Groningen"  # station waar dit scherm op staat
-API_KEY = "70dc2324e9a7f4f81b9d37f2a1489ef6"
+API_KEY = "70dc2324e9a7f4f81b9d37f2a1489ef6"  # openweather api key
 db = database.StationsZuilDB()
 
 

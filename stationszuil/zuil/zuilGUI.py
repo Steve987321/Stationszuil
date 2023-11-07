@@ -3,12 +3,14 @@ from datetime import datetime
 from tkinter import *
 from tkinter import messagebox
 
+# voor Tkinter widgets
 GREEN = "#0F0"
 RED = "#F00"
 BLUE = "#00F"
 WHITE = "#FFF"
 GRAY = "#999"
 BLACK = "#000"
+
 
 class ZuilGUI:
     """Zuil window en UI om berichten te plaatsen op een random station"""

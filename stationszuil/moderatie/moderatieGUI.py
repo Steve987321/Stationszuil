@@ -3,7 +3,7 @@ from tkinter import *
 from tkinter import messagebox
 from totaaloverzichtscherm import TotaalOverzichtScherm
 
-
+# voor Tkinter widgets
 GREEN = "#0F0"
 RED = "#F00"
 BLUE = "#00F"
