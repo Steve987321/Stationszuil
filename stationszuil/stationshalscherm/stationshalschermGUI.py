@@ -2,6 +2,10 @@ from tkinter import *
 from stationinfo import *
 from datetime import datetime
 
+# ns kleuren voor scherm
+NS_GEEL = "#FEC917"
+NS_BLAUW = "#03307b"
+
 
 def verklein_image(img: PhotoImage, factorx, factory):
     """Geeft een verkleinde PhotoImage terug met de gegeven factoren
@@ -32,9 +36,6 @@ def verklein_image(img: PhotoImage, factorx, factory):
         for y in range(0, h, stepy):
             rgb = img.get(x, y)
 
-            # TODO: verander dit zodat dit niet naar hex color string hoeft, 
-            # new_img.put rgb can't parse color "255"
-
             rgbstr = "#"
             for i in rgb:
                 hexstr = hex(i)[2:]
@@ -53,9 +54,9 @@ class StationBerichtWidget:
 
     def __init__(self, root: Misc):
         self.root = root
-        self.berichten_frame = Frame(root)
-        self.naam = Label(self.berichten_frame)
-        self.bericht = Label(self.berichten_frame, font="Arial 15 italic")
+        self.berichten_frame = Frame(root, bg=NS_GEEL)
+        self.naam = Label(self.berichten_frame, fg=NS_BLAUW, bg=NS_GEEL)
+        self.bericht = Label(self.berichten_frame, font="Arial 15 italic",  fg=NS_BLAUW, bg=NS_GEEL)
         self.berichten_frame.pack(pady=10)
 
     def update(self, bericht: StationBericht = None, dictstr=None, maak_leeg=False):
@@ -83,7 +84,7 @@ class StationBerichtWidget:
         self.bericht.pack()
 
         # spacing
-        Label(self.root, text="").pack()
+        Label(self.root, text="", bg=NS_GEEL).pack()
 
 
 class StationshalUI:
@@ -97,14 +98,16 @@ class StationshalUI:
         self.root.title("Stationshalscherm")
         self.root.resizable(False, False)
         self.root.geometry("700x600")
+        self.root["background"] = NS_GEEL
 
         # root frames
-        self.weer_info_frame = Frame(self.root)
-        self.bericht_frame = Frame(self.root)
-        self.faciliteiten_frame = Frame(self.root)
+        self.weer_info_frame = Frame(self.root, bg=NS_GEEL)
+        self.bericht_frame = Frame(self.root, bg=NS_GEEL)
+        self.faciliteiten_frame = Frame(self.root, bg=NS_GEEL)
 
         # klok
-        self.klok_label = Label(self.root, text=datetime.now().strftime("%H:%M:%S"), font="Courier 25 normal")
+        self.klok_label = Label(self.root, text=datetime.now().strftime("%H:%M:%S"), font="Courier 25 normal",
+                                fg=NS_BLAUW, bg=NS_GEEL)
 
         # image faciliteiten
         self.img_bike = PhotoImage(file="img_faciliteiten/img_ovfiets.png")
@@ -137,24 +140,19 @@ class StationshalUI:
         self.bericht_frame.pack(side=RIGHT, fill=BOTH, padx=80, pady=20)
 
         # weer info frame
-        self.weer_icon = Label(self.weer_info_frame)
-        self.station_label = Label(self.weer_info_frame, text=stationshalscherm_plek, font="Arial 25 normal")
-        self.temp_label = Label(self.weer_info_frame, textvariable=self.temperatuur, font="Arial 35 normal")
-        self.weer_label = Label(self.weer_info_frame, text="", font="Arial 20 normal")
+        self.weer_icon = Label(self.weer_info_frame, fg=NS_BLAUW, bg=NS_GEEL)
+        self.station_label = Label(self.weer_info_frame, text=stationshalscherm_plek, font="Arial 25 normal",
+                                   fg=NS_BLAUW, bg=NS_GEEL)
+        self.temp_label = Label(self.weer_info_frame, textvariable=self.temperatuur, font="Arial 35 normal",
+                                fg=NS_BLAUW, bg=NS_GEEL)
+        self.weer_label = Label(self.weer_info_frame, text="", font="Arial 20 normal",
+                                fg=NS_BLAUW, bg=NS_GEEL)
 
         # layout
         self.weer_icon.pack()
         self.station_label.pack()
         self.temp_label.pack()
         self.weer_label.pack()
-        # self.station_label.grid(column=0, row=0, padx=75)
-        # self.temp_label.grid(column=0, row=1)
-        # self.weer_label.grid(row=0, column=1)
-
-        # self.station_label.place(relx=0.05, rely=0.5)
-        # self.temp_label.place(relx=0.05, rely=0.57)
-        # self.weer_label.place(relx=0.35, rely=0.55)
-        # self.weer_icon.place(relx=0.25, rely=0.4)
 
         # station frame
         self.bericht_labels = (
