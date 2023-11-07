@@ -149,12 +149,12 @@ class TotaalOverzichtScherm:
 
         # groepeer de berichten in groepen van 15
         if len(db_berichten) > 15:
-            for i in range(15, len(db_berichten), 15):
-                self.paginas.append(db_berichten[:i])
-                db_berichten = db_berichten[i:]
+            for _ in range(0, len(db_berichten), 15):
+                self.paginas.append(db_berichten[:15])
+                db_berichten = db_berichten[15:]
 
         # als het niet precies uit komt vul een laatste pagina met de overige berichten
-        if len(db_berichten) >= 0:
+        if len(db_berichten) > 0:
             self.paginas.append([])
             laatste_index = len(self.paginas) - 1
             for bericht in db_berichten:
